@@ -50,7 +50,7 @@ exports.run = function(spawn){
         console.log("All Counts:", JSON.stringify(counts));
         console.log('Checking', type, 'count:', counts[type]);
         if (counts[type] < typeInfo.minCount) {
-            return buildCreep(spawn, type, typeParts[type]);
+            return buildCreep(spawn, type, typeInfo.parts);
         }
     }
 };
