@@ -16,7 +16,7 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
 
 var typesInfo = {
     harvester: {
-        minCount: 2,
+        minCount: 1,
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     attack: {
