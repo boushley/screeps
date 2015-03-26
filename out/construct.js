@@ -2,8 +2,8 @@ var _ = require('lodash');
 
 var buildCreep = exports.buildCreep = function(spawn, type, parts) {
     var id = Math.random().toString(32).substr(2, 8);
-    console.log(type, 'Created', id);
-    Game.spawns.Spawn1.createCreep(
+
+    var result = Game.spawns.Spawn1.createCreep(
         parts,
         type + '-' + id,
         {
@@ -12,6 +12,10 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
             spawnName: spawn.name
         }
     );
+
+    if (result === Game.OK) {
+        console.log('Created', type+'-'+id);
+    }
 };
 
 var typesInfo = {
