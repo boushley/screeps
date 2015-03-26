@@ -5,7 +5,7 @@ var harvest = require('harvest'),
     heal = require('healer');
 
 exports.run = function() {
-    for(var i in Game.creeps) {
+    for (var i in Game.creeps) {
         var creep = Game.creeps[i];
         if (creep.memory.role === 'harvester') {
             harvest(creep);
