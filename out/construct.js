@@ -30,8 +30,8 @@ var typesInfo = {
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     },
     builder: {
-        minCount: 1,
-        niceCount: 1,
+        minCount: 0,
+        niceCount: 0,
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     healer: {
