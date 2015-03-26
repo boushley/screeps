@@ -1,12 +1,13 @@
 var _ = require('lodash');
 
 var buildCreep = exports.buildCreep = function(spawn, type, parts) {
-    spawn.memory.counts[type] += 1;
-    console.log(type, 'Created', spawn.memory.counts[type] );
+    var id = Math.random().toString(32).substr(2, 8);
+    console.log(type, 'Created', id);
     Game.spawns.Spawn1.createCreep(
         parts,
-        type + ' ' + spawn.memory.counts[type] ,
+        type + '-' + id,
         {
+            id: id,
             role: type,
             spawn: spawn
         }
@@ -24,19 +25,38 @@ exports.run = function(spawn){
     if (!spawn || spawn.spawning) {
         return;
     }
+    var counts = getCounts();
     for (var i = 0; i < orderedTypes.length; i++) {
         var type = orderedTypes[i];
-        if (!spawn.memory.counts) {
-            spawn.memory.counts = {};
-        }
-        console.log("All Counts:", JSON.stringify(spawn.memory.counts));
+        console.log("All Counts:", JSON.stringify(counts));
         if (spawn.memory.counts[type] === undefined) {
             spawn.memory.counts[type] = 0;
         }
-        console.log("All Counts:", JSON.stringify(spawn.memory.counts));
-        console.log('Checking', type, 'count:', spawn.memory.counts[type]);
-        if (spawn.memory.counts[type] < 2) {
+        console.log("All Counts:", JSON.stringify(counts));
+        console.log('Checking', type, 'count:', counts[type]);
+        if (counts[type] < 1) {
             return buildCreep(spawn, type, typeParts[type]);
         }
     }
 };
+
+function getCounts() {
+    var counts = {};
+
+    for(i in Game.creeps) {
+        var creep = Game.creeps[i];
+        if (!creep.my) {
+            continue;
+        }
+
+        var role = creep.memory.role;
+
+        if (counts[role] === undefined) {
+            counts[role] = 1;
+        } else {
+            counts[role] += 1;
+        }
+    }
+
+    return counts;
+}
