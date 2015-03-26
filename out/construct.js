@@ -29,8 +29,8 @@ exports.run = function(spawn){
     for (var i = 0; i < orderedTypes.length; i++) {
         var type = orderedTypes[i];
         console.log("All Counts:", JSON.stringify(counts));
-        if (spawn.memory.counts[type] === undefined) {
-            spawn.memory.counts[type] = 0;
+        if (counts[type] === undefined) {
+            counts[type] = 0;
         }
         console.log("All Counts:", JSON.stringify(counts));
         console.log('Checking', type, 'count:', counts[type]);
