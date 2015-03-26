@@ -14,12 +14,25 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
     );
 };
 
-var typeParts = {
-    harvester: [Game.WORK, Game.CARRY, Game.MOVE],
-    attack: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE],
-    guard: [Game.ATTACK, Game.MOVE]
+var typesInfo = {
+    harvester: {
+        minCount: 2,
+        parts: [Game.WORK, Game.CARRY, Game.MOVE]
+    },
+    attack: {
+        minCount: 0,
+        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    rangedGuard: {
+        minCount: 1,
+        parts: [Game.RANGED_ATTACK, Game.MOVE]
+    },
+    guard: {
+        minCount: 1
+        parts: [Game.ATTACK, Game.MOVE]
+    }
 };
-var orderedTypes = ['harvester', 'attack', 'guard'];
+var orderedTypes = ['harvester', 'attack', 'guard', 'rangedGuard'];
 
 exports.run = function(spawn){
     if (!spawn || spawn.spawning) {
@@ -27,14 +40,16 @@ exports.run = function(spawn){
     }
     var counts = getCounts();
     for (var i = 0; i < orderedTypes.length; i++) {
-        var type = orderedTypes[i];
+        var type = orderedTypes[i],
+            typeInfo = typesInfo[type];
+
         console.log("All Counts:", JSON.stringify(counts));
         if (counts[type] === undefined) {
             counts[type] = 0;
         }
         console.log("All Counts:", JSON.stringify(counts));
         console.log('Checking', type, 'count:', counts[type]);
-        if (counts[type] < 1) {
+        if (counts[type] < typeInfo.minCount) {
             return buildCreep(spawn, type, typeParts[type]);
         }
     }

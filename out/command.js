@@ -14,6 +14,8 @@ exports.run = function() {
             guard(creep);
         } else if (creep.memory.role === 'attack') {
             attack(creep);
+        } else if (creep.memory.role === 'rangedGuard') {
+            guard(creep);
         }
     }
 };

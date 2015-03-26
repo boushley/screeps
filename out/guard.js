@@ -5,8 +5,18 @@ module.exports = exports = function(creep) {
         }
     });
 
-    if(target) {
-        creep.moveTo(target);
-        creep.attack(target);
+    if (target) {
+
+        if (creep.getActiveBodyparts(Game.RANGED_ATTACK)) {
+            if (target.pos.inRangeTo(creep.pos, 3)) {
+                creep.rangedAttack(target);
+            } else {
+                creep.moveTo(target);
+            }
+        } else {
+            creep.moveTo(target);
+            creep.attack(target);
+        }
+
     }
 };
