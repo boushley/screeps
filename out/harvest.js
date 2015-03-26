@@ -1,6 +1,8 @@
 module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
-    if (creep.energy < creep.energyCapacity) {
+    if (!isViable(creep)) {
+        creep.suicide();
+    } else if (creep.energy < creep.energyCapacity) {
         var source = spawn.pos.findClosest(Game.SOURCES);
         if (source) {
             creep.moveTo(source);
@@ -12,3 +14,15 @@ module.exports = exports = function (creep) {
     }
 };
 
+
+// Determines if any body parts are completely damanged
+function isViable(creep) {
+    for (var i = 0; i < creep.body.length; i++) {
+        var part = creep.body[i];
+        if (part.hits < 1) {
+            return false;
+        }
+    }
+
+    return true;
+}

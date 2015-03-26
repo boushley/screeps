@@ -17,18 +17,22 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
 var typesInfo = {
     harvester: {
         minCount: 1,
+        niceCount: 1,
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     attack: {
         minCount: 0,
+        niceCount: 0,
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     },
     rangedGuard: {
         minCount: 1,
+        niceCount: 2,
         parts: [Game.RANGED_ATTACK, Game.MOVE]
     },
     guard: {
         minCount: 1,
+        niceCount: 2,
         parts: [Game.ATTACK, Game.MOVE]
     }
 };
@@ -48,6 +52,16 @@ exports.run = function(spawn){
         }
         if (counts[type] < typeInfo.minCount) {
             return buildCreep(spawn, type, typeInfo.parts);
+        }
+    }
+
+    if (spawn.energy > 1000) {
+        for (var i = 0; i < orderedTypes.length; i++) {
+            var type = orderedTypes[i],
+                typeInfo = typesInfo[type];
+            if (counts[type] < typeInfo.niceCount) {
+                return buildCreep(spawn, type, typeInfo.parts);
+            }
         }
     }
 };
