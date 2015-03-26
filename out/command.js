@@ -2,7 +2,7 @@ var harvest = require('harvest'),
     build = require('build'),
     guard = require('guard'),
     attack = require('attack'),
-    heal = require('heal');
+    heal = require('healer');
 
 exports.run = function() {
     for(var i in Game.creeps) {
