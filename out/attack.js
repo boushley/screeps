@@ -1,5 +1,6 @@
 module.exports = exports = function(creep) {
-    var target = creep.pos.findClosest(Game.HOSTILE_CREEPS, {
+    var spawn = Game.spawns[creep.memory.spawnName];
+    var target = spawn.pos.findClosest(Game.HOSTILE_CREEPS, {
         filter: function(object) {
             var hasAttack = object.getActiveBodyparts(Game.ATTACK) === 0,
                 hasRangedAttack = object.getActiveBodyparts(Game.RANGED_ATTACK) === 0;

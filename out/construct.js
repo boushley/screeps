@@ -9,7 +9,7 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
         {
             id: id,
             role: type,
-            spawn: spawn
+            spawnName: spawn.name
         }
     );
 };

@@ -1,13 +1,13 @@
 module.exports = exports = function(creep) {
+    var spawn = Game.spawns[creep.memory.spawnName];
     var target = creep.pos.findClosest(Game.HOSTILE_CREEPS, {
         filter: function(object) {
-            return object.pos.inRangeTo(Game.spawns.Spawn1.pos, 3);
+            return object.pos.inRangeTo(spawn.pos, 3);
         }
     });
 
     if (target) {
-
-        if (creep.getActiveBodyparts(Game.RANGED_ATTACK)) {
+        if (creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0) {
             if (target.pos.inRangeTo(creep.pos, 3)) {
                 creep.rangedAttack(target);
             } else {
