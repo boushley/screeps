@@ -43,12 +43,9 @@ exports.run = function(spawn){
         var type = orderedTypes[i],
             typeInfo = typesInfo[type];
 
-        console.log("All Counts:", JSON.stringify(counts));
         if (counts[type] === undefined) {
             counts[type] = 0;
         }
-        console.log("All Counts:", JSON.stringify(counts));
-        console.log('Checking', type, 'count:', counts[type]);
         if (counts[type] < typeInfo.minCount) {
             return buildCreep(spawn, type, typeInfo.parts);
         }
