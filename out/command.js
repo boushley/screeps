@@ -1,7 +1,8 @@
 var harvest = require('harvest'),
     build = require('build'),
     guard = require('guard'),
-    attack = require('attack');
+    attack = require('attack'),
+    heal = require('heal');
 
 exports.run = function() {
     for(var i in Game.creeps) {
@@ -16,6 +17,8 @@ exports.run = function() {
             attack(creep);
         } else if (creep.memory.role === 'rangedGuard') {
             guard(creep);
+        } else if (creep.memory.role === 'healer') {
+            heal(creep);
         }
     }
 };

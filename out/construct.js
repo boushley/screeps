@@ -29,6 +29,11 @@ var typesInfo = {
         niceCount: 0,
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     },
+    healer: {
+        minCount: 1,
+        niceCount: 1,
+        parts: [Game.HEAL, Game.MOVE]
+    },
     rangedGuard: {
         minCount: 1,
         niceCount: 2,
@@ -40,7 +45,7 @@ var typesInfo = {
         parts: [Game.ATTACK, Game.MOVE]
     }
 };
-var orderedTypes = ['harvester', 'attack', 'guard', 'rangedGuard'];
+var orderedTypes = ['harvester', 'attack', 'guard', 'rangedGuard', 'healer'];
 
 exports.run = function(spawn){
     if (!spawn || spawn.spawning) {
