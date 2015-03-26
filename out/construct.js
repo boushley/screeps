@@ -28,7 +28,7 @@ var typesInfo = {
         parts: [Game.RANGED_ATTACK, Game.MOVE]
     },
     guard: {
-        minCount: 1
+        minCount: 1,
         parts: [Game.ATTACK, Game.MOVE]
     }
 };
@@ -58,7 +58,7 @@ exports.run = function(spawn){
 function getCounts() {
     var counts = {};
 
-    for(i in Game.creeps) {
+    for(var i in Game.creeps) {
         var creep = Game.creeps[i];
         if (!creep.my) {
             continue;
