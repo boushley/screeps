@@ -1,24 +1,6 @@
 var _ = require('lodash');
 
-var buildCreep = exports.buildCreep = function(spawn, type, parts) {
-    var id = Math.random().toString(32).substr(2, 8);
-
-    var result = Game.spawns.Spawn1.createCreep(
-        parts,
-        type + '-' + id,
-        {
-            id: id,
-            role: type,
-            spawnName: spawn.name
-        }
-    );
-
-    if (result === Game.OK) {
-        console.log('Created', type+'-'+id);
-    }
-};
-
-var typesInfo = {
+var TYPES_INFO = {
     harvester: {
         counts: [1, 2],
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
@@ -44,49 +26,63 @@ var typesInfo = {
         parts: [Game.ATTACK, Game.MOVE]
     }
 };
-var orderedTypes = ['harvester', 'attack', 'guard', 'rangedGuard', 'builder', 'healer'];
+var COSTS = {
+    move: 50,
+    work: 20,
+    carry: 50,
+    attack: 80,
+    ranged_attack: 150,
+    heal: 200,
+    tough: 20
+};
+var ORDERED_TYPES = ['harvester', 'attack', 'guard', 'rangedGuard', 'builder', 'healer'];
 
-exports.run = function(spawn){
+exports.run = function(spawn) {
     if (!spawn || spawn.spawning) {
         return;
     }
     var counts = getCounts();
 
-    for (var i = 0; i < orderedTypes.length; i++) {
-        var type = orderedTypes[i],
-            typeInfo = typesInfo[type],
-            c = typeInfo.counts[0];
+    loopTypes(0, 0);
+    loopTypes(400, 1);
+    loopTypes(600, 2);
 
-        if (counts[type] === undefined) {
-            counts[type] = 0;
-        }
-        if (counts[type] < c) {
-            return buildCreep(spawn, type, typeInfo.parts);
-        }
-    }
+    function loopTypes(threshold, index) {
+        if (spawn.energy < threshold) { return; }
+        for (var i = 0; i < ORDERED_TYPES.length; i++) {
+            var type = ORDERED_TYPES[i],
+                typeInfo = TYPES_INFO[type],
+                c = typeInfo.counts[index];
 
-    if (spawn.energy > 400) {
-        for (var i = 0; i < orderedTypes.length; i++) {
-            var type = orderedTypes[i],
-                typeInfo = typesInfo[type],
-                c = typeInfo.counts[1] || typeInfo.counts[0];
-            if (counts[type] < c) {
-                return buildCreep(spawn, type, typeInfo.parts);
+            if (counts[type] === undefined) {
+                counts[type] = 0;
             }
-        }
-    }
-
-    if (spawn.energy > 600) {
-        for (var i = 0; i < orderedTypes.length; i++) {
-            var type = orderedTypes[i],
-                typeInfo = typesInfo[type],
-                c = typeInfo.counts[2] || typeInfo.counts[0];
             if (counts[type] < c) {
                 return buildCreep(spawn, type, typeInfo.parts);
             }
         }
     }
 };
+
+var buildCreep = exports.buildCreep = function(spawn, type, parts) {
+    var id = Math.random().toString(32).substr(2, 8);
+
+    var result = Game.spawns.Spawn1.createCreep(
+        parts,
+        type + '-' + id,
+        {
+            id: id,
+            role: type,
+            spawnName: spawn.name
+        }
+    );
+
+    if (result === Game.OK) {
+        console.log('Created', type+'-'+id);
+    }
+};
+
+
 
 function getCounts() {
     var counts = {};
