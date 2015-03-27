@@ -1,6 +1,8 @@
-var _ = require('lodash');
+"use strict";
 
-var TYPES_INFO = {
+var _ = require("lodash");
+
+var TYPES_INFO = Object.freeze({
     harvester: {
         counts: [1, 2],
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
@@ -25,8 +27,8 @@ var TYPES_INFO = {
         counts: [1, 2, 2],
         parts: [Game.ATTACK, Game.MOVE]
     }
-};
-var COSTS = {
+});
+var COSTS = Object.freeze({
     move: 50,
     work: 20,
     carry: 50,
@@ -34,10 +36,10 @@ var COSTS = {
     ranged_attack: 150,
     heal: 200,
     tough: 20
-};
-var ORDERED_TYPES = ['harvester', 'attack', 'guard', 'rangedGuard', 'builder', 'healer'];
+});
+var ORDERED_TYPES = Object.freeze(["harvester", "attack", "guard", "rangedGuard", "builder", "healer"]);
 
-exports.run = function(spawn) {
+exports.run = function (spawn) {
     if (!spawn || spawn.spawning) {
         return;
     }
@@ -48,7 +50,9 @@ exports.run = function(spawn) {
     loopTypes(600, 2);
 
     function loopTypes(threshold, index) {
-        if (spawn.energy < threshold) { return; }
+        if (spawn.energy < threshold) {
+            return;
+        }
         for (var i = 0; i < ORDERED_TYPES.length; i++) {
             var type = ORDERED_TYPES[i],
                 typeInfo = TYPES_INFO[type],
@@ -64,30 +68,24 @@ exports.run = function(spawn) {
     }
 };
 
-var buildCreep = exports.buildCreep = function(spawn, type, parts) {
+var buildCreep = exports.buildCreep = function (spawn, type, parts) {
     var id = Math.random().toString(32).substr(2, 8);
 
-    var result = Game.spawns.Spawn1.createCreep(
-        parts,
-        type + '-' + id,
-        {
-            id: id,
-            role: type,
-            spawnName: spawn.name
-        }
-    );
+    var result = Game.spawns.Spawn1.createCreep(parts, type + "-" + id, {
+        id: id,
+        role: type,
+        spawnName: spawn.name
+    });
 
     if (result === Game.OK) {
-        console.log('Created', type+'-'+id);
+        console.log("Created", type + "-" + id);
     }
 };
-
-
 
 function getCounts() {
     var counts = {};
 
-    for(var i in Game.creeps) {
+    for (var i in Game.creeps) {
         var creep = Game.creeps[i];
         if (!creep.my) {
             continue;

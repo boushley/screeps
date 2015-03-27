@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     if (!isViable(creep)) {
@@ -5,7 +7,7 @@ module.exports = exports = function (creep) {
     } else if (creep.energy < creep.energyCapacity) {
         if (!spawn.memory.targetSourceId) {
             var s = creep.pos.findClosest(Game.SOURCES, {
-                filter: function(source) {
+                filter: function filter(source) {
                     return source.energy > 20;
                 }
             });
@@ -28,7 +30,6 @@ module.exports = exports = function (creep) {
         creep.transferEnergy(spawn);
     }
 };
-
 
 // Determines if any body parts are completely damanged
 function isViable(creep) {

@@ -1,9 +1,11 @@
-var harvest = require('harvest');
+"use strict";
 
-module.exports = exports = function(creep) {
+var harvest = require("harvest");
+
+module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     var target = spawn.pos.findClosest(Game.CONSTRUCTION_SITES, {
-        filter: function(site) {
+        filter: function filter(site) {
             return site.my;
         }
     });

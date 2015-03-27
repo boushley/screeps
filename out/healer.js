@@ -1,7 +1,9 @@
-module.exports = exports = function(creep) {
+"use strict";
+
+module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     var target = creep.pos.findClosest(Game.MY_CREEPS, {
-        filter: function(object) {
+        filter: function filter(object) {
             return object.hits < object.hitsMax;
         }
     });
@@ -22,5 +24,4 @@ module.exports = exports = function(creep) {
 
         creep.moveTo(rallyPoint);
     }
-
 };

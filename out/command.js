@@ -1,23 +1,25 @@
-var harvest = require('harvest'),
-    build = require('build'),
-    guard = require('guard'),
-    attack = require('attack'),
-    heal = require('healer');
+"use strict";
 
-exports.run = function() {
+var harvest = require("harvest"),
+    build = require("build"),
+    guard = require("guard"),
+    attack = require("attack"),
+    heal = require("healer");
+
+exports.run = function () {
     for (var i in Game.creeps) {
         var creep = Game.creeps[i];
-        if (creep.memory.role === 'harvester') {
+        if (creep.memory.role === "harvester") {
             harvest(creep);
-        } else if (creep.memory.role === 'builder') {
+        } else if (creep.memory.role === "builder") {
             build(creep);
-        } else if (creep.memory.role === 'guard') {
+        } else if (creep.memory.role === "guard") {
             guard(creep);
-        } else if (creep.memory.role === 'attack') {
+        } else if (creep.memory.role === "attack") {
             attack(creep);
-        } else if (creep.memory.role === 'rangedGuard') {
+        } else if (creep.memory.role === "rangedGuard") {
             guard(creep);
-        } else if (creep.memory.role === 'healer') {
+        } else if (creep.memory.role === "healer") {
             heal(creep);
         }
     }
