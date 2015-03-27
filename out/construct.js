@@ -20,33 +20,27 @@ var buildCreep = exports.buildCreep = function(spawn, type, parts) {
 
 var typesInfo = {
     harvester: {
-        minCount: 1,
-        niceCount: 1,
+        counts: [1],
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     attack: {
-        minCount: 0,
-        niceCount: 0,
+        counts: [0],
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     },
     builder: {
-        minCount: 0,
-        niceCount: 0,
+        counts: [0],
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     healer: {
-        minCount: 1,
-        niceCount: 1,
+        counts: [0],
         parts: [Game.HEAL, Game.MOVE]
     },
     rangedGuard: {
-        minCount: 1,
-        niceCount: 2,
+        counts: [1, 1, 2],
         parts: [Game.RANGED_ATTACK, Game.MOVE]
     },
     guard: {
-        minCount: 1,
-        niceCount: 2,
+        counts: [1, 2, 2],
         parts: [Game.ATTACK, Game.MOVE]
     }
 };
@@ -57,23 +51,37 @@ exports.run = function(spawn){
         return;
     }
     var counts = getCounts();
+
     for (var i = 0; i < orderedTypes.length; i++) {
         var type = orderedTypes[i],
-            typeInfo = typesInfo[type];
+            typeInfo = typesInfo[type],
+            c = typeInfo.counts[0];
 
         if (counts[type] === undefined) {
             counts[type] = 0;
         }
-        if (counts[type] < typeInfo.minCount) {
+        if (counts[type] < c) {
             return buildCreep(spawn, type, typeInfo.parts);
         }
     }
 
-    if (spawn.energy > 1000) {
+    if (spawn.energy > 400) {
         for (var i = 0; i < orderedTypes.length; i++) {
             var type = orderedTypes[i],
-                typeInfo = typesInfo[type];
-            if (counts[type] < typeInfo.niceCount) {
+                typeInfo = typesInfo[type],
+                c = typeInfo.counts[1] || typeInfo.counts[0];
+            if (counts[type] < c) {
+                return buildCreep(spawn, type, typeInfo.parts);
+            }
+        }
+    }
+
+    if (spawn.energy > 600) {
+        for (var i = 0; i < orderedTypes.length; i++) {
+            var type = orderedTypes[i],
+                typeInfo = typesInfo[type],
+                c = typeInfo.counts[2] || typeInfo.counts[0];
+            if (counts[type] < c) {
                 return buildCreep(spawn, type, typeInfo.parts);
             }
         }
