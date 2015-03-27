@@ -32,7 +32,7 @@ var typesInfo = {
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
     healer: {
-        counts: [0],
+        counts: [0, 1],
         parts: [Game.HEAL, Game.MOVE]
     },
     rangedGuard: {
