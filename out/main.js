@@ -1,5 +1,5 @@
-var construct = require('construct'),
+var factory = require('factory'),
     command = require('command');
 
-construct.run(Game.spawns.Spawn1);
+factory.run(Game.spawns.Spawn1);
 command.run();
