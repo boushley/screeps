@@ -1,0 +1,23 @@
+{
+  "name": "boushley-screeps",
+  "version": "0.1.0",
+  "description": "Source for playing screeps",
+  "main": "out/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boushley/screeps.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boushley/screeps/issues"
+  },
+  "homepage": "https://github.com/boushley/screeps",
+  "devDependencies": {
+    "broccoli": "^0.15.3",
+    "broccoli-babel-transpiler": "^4.0.1"
+  }
+}
