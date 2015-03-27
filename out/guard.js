@@ -18,5 +18,12 @@ module.exports = exports = function(creep) {
             creep.attack(target);
         }
 
+    } else {
+        var rallyPoint = spawn.pos;
+        if (Game.flags.BoushleyRally) {
+            rallyPoint = Game.flags.BoushleyRaly.pos;
+        }
+
+        creep.moveTo(rallyPoint);
     }
 };
