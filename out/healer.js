@@ -7,8 +7,10 @@ module.exports = exports = function(creep) {
     });
 
     if (target) {
-        if (creep.pos.inRangeTo(target, 2)) {
+        if (creep.pos.isNearTo(target)) {
             creep.heal(target);
+        } else if (creep.pos.inRangeTo(target, 3)) {
+            creep.rangedHeal(target);
         } else {
             creep.moveTo(target);
         }
