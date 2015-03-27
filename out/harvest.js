@@ -3,28 +3,27 @@ module.exports = exports = function (creep) {
     if (!isViable(creep)) {
         creep.suicide();
     } else if (creep.energy < creep.energyCapacity) {
-        if (!creep.memory.targetId) {
+        if (!spawn.memory.targetSourceId) {
             var s = creep.pos.findClosest(Game.SOURCES, {
                 filter: function(source) {
                     return source.energy > 20;
                 }
             });
             if (s) {
-                creep.memory.targetId = s.id;
+                spawn.memory.targetSourceId = s.id;
             }
         }
 
-        if (creep.memory.targetId) {
-            var source = Game.getObjectById(creep.memory.targetId);
+        if (spawn.memory.targetSourceId) {
+            var source = Game.getObjectById(spawn.memory.targetSourceId);
             if (source && source.energy > 10) {
                 creep.moveTo(source);
                 creep.harvest(source);
             } else {
-                creep.memory.targetId = null;
+                spawn.memory.targetSourceId = null;
             }
         }
     } else {
-        creep.memory.targetId = null;
         creep.moveTo(spawn);
         creep.transferEnergy(spawn);
     }
