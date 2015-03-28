@@ -2,32 +2,38 @@
 
 let _ = require('lodash');
 
-const TYPES_INFO = Object.freeze({
-    harvester: {
+const TYPES_INFO = Object.freeze([
+    {
         counts: [1, 2],
+        type: 'harvester',
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
-    attack: {
+    {
+        type: 'attack',
         counts: [0],
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     },
-    builder: {
+    {
+        type: 'builder',
         counts: [0],
         parts: [Game.WORK, Game.CARRY, Game.MOVE]
     },
-    healer: {
+    {
+        type: 'healer',
         counts: [0, 1],
         parts: [Game.HEAL, Game.MOVE]
     },
-    rangedGuard: {
+    {
+        type: 'rangedGuard',
         counts: [1, 1, 2],
         parts: [Game.RANGED_ATTACK, Game.MOVE]
     },
-    guard: {
+    {
+        type: 'guard',
         counts: [1, 2, 2],
         parts: [Game.ATTACK, Game.MOVE]
     }
-});
+]);
 const COSTS = Object.freeze({
     move: 50,
     work: 20,
@@ -37,7 +43,6 @@ const COSTS = Object.freeze({
     heal: 200,
     tough: 20
 });
-const ORDERED_TYPES = Object.freeze(['harvester', 'attack', 'guard', 'rangedGuard', 'builder', 'healer']);
 
 let buildCreep = exports.buildCreep = function(spawn, type, parts) {
     let id = Math.random().toString(32).substr(2, 8);
@@ -80,21 +85,20 @@ function getCounts() {
     return counts;
 }
 
-function loopTypes(spawn, counts, threshold, index) {
+function loopTypes(spawn, counts, threshold, level) {
     if (spawn.energy < threshold) {
         return;
     }
 
-    for (let i = 0; i < ORDERED_TYPES.length; i++) {
-        let type = ORDERED_TYPES[i],
-            typeInfo = TYPES_INFO[type],
-            c = typeInfo.counts[index];
+    for (let i = 0; i < TYPES_INFO.length; i++) {
+        let typeInfo = TYPES_INFO[i],
+            c = typeInfo.counts[level];
 
-        if (counts[type] === undefined) {
-            counts[type] = 0;
+        if (counts[typeInfo.type] === undefined) {
+            counts[typeInfo.type] = 0;
         }
-        if (counts[type] < c) {
-            buildCreep(spawn, type, typeInfo.parts);
+        if (counts[typeInfo.type] < c) {
+            buildCreep(spawn, typeInfo.type, typeInfo.parts);
             return;
         }
     }

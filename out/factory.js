@@ -2,32 +2,31 @@
 
 var _ = require("lodash");
 
-var TYPES_INFO = Object.freeze({
-    harvester: {
-        counts: [1, 2],
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    attack: {
-        counts: [0],
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    builder: {
-        counts: [0],
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    healer: {
-        counts: [0, 1],
-        parts: [Game.HEAL, Game.MOVE]
-    },
-    rangedGuard: {
-        counts: [1, 1, 2],
-        parts: [Game.RANGED_ATTACK, Game.MOVE]
-    },
-    guard: {
-        counts: [1, 2, 2],
-        parts: [Game.ATTACK, Game.MOVE]
-    }
-});
+var TYPES_INFO = Object.freeze([{
+    counts: [1, 2],
+    type: "harvester",
+    parts: [Game.WORK, Game.CARRY, Game.MOVE]
+}, {
+    type: "attack",
+    counts: [0],
+    parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+}, {
+    type: "builder",
+    counts: [0],
+    parts: [Game.WORK, Game.CARRY, Game.MOVE]
+}, {
+    type: "healer",
+    counts: [0, 1],
+    parts: [Game.HEAL, Game.MOVE]
+}, {
+    type: "rangedGuard",
+    counts: [1, 1, 2],
+    parts: [Game.RANGED_ATTACK, Game.MOVE]
+}, {
+    type: "guard",
+    counts: [1, 2, 2],
+    parts: [Game.ATTACK, Game.MOVE]
+}]);
 var COSTS = Object.freeze({
     move: 50,
     work: 20,
@@ -37,7 +36,6 @@ var COSTS = Object.freeze({
     heal: 200,
     tough: 20
 });
-var ORDERED_TYPES = Object.freeze(["harvester", "attack", "guard", "rangedGuard", "builder", "healer"]);
 
 var buildCreep = exports.buildCreep = function (spawn, type, parts) {
     var id = Math.random().toString(32).substr(2, 8);
@@ -74,21 +72,20 @@ function getCounts() {
     return counts;
 }
 
-function loopTypes(spawn, counts, threshold, index) {
+function loopTypes(spawn, counts, threshold, level) {
     if (spawn.energy < threshold) {
         return;
     }
 
-    for (var i = 0; i < ORDERED_TYPES.length; i++) {
-        var type = ORDERED_TYPES[i],
-            typeInfo = TYPES_INFO[type],
-            c = typeInfo.counts[index];
+    for (var i = 0; i < TYPES_INFO.length; i++) {
+        var typeInfo = TYPES_INFO[i],
+            c = typeInfo.counts[level];
 
-        if (counts[type] === undefined) {
-            counts[type] = 0;
+        if (counts[typeInfo.type] === undefined) {
+            counts[typeInfo.type] = 0;
         }
-        if (counts[type] < c) {
-            buildCreep(spawn, type, typeInfo.parts);
+        if (counts[typeInfo.type] < c) {
+            buildCreep(spawn, typeInfo.type, typeInfo.parts);
             return;
         }
     }
