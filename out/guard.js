@@ -2,8 +2,8 @@
 module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     var target = creep.pos.findClosest(Game.HOSTILE_CREEPS, {
-        filter: function filter(object) {
-            return object.pos.inRangeTo(spawn.pos, 12);
+        filter: function (h) {
+            return h.pos.inRangeTo(spawn.pos, 12);
         }
     });
 
@@ -49,5 +49,14 @@ module.exports = exports = function (creep) {
         rallyPoint = Game.flags.BoushleyRally.pos;
     }
 
-    creep.moveTo(rallyPoint);
+    var x = rallyPoint.x;
+    var y = rallyPoint.y;
+
+    if (creep.getActiveBodyparts(Game.ATTACK) > 0) {
+        y += 1;
+    } else {
+        y -= 1;
+    }
+
+    creep.moveTo(x, y);
 };

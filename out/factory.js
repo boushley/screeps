@@ -3,7 +3,7 @@
 var _ = require("lodash");
 
 var TYPES_INFO = Object.freeze([{
-    counts: [1, 2, 3],
+    counts: [1, 2, 2],
     type: "harvester",
     parts: [Game.WORK, Game.CARRY, Game.MOVE]
 }, {
@@ -100,5 +100,5 @@ exports.run = function (spawn) {
     loopTypes(spawn, counts, 0, 0);
     loopTypes(spawn, counts, 400, 1);
     loopTypes(spawn, counts, 600, 2);
-    loopTypes(spawn, counts, 800, 2);
+    loopTypes(spawn, counts, 800, 3);
 };
