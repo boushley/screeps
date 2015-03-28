@@ -1,3 +1,5 @@
+'use strict';
+
 var harvest = require('harvest');
 
 module.exports = exports = function(creep) {

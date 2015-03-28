@@ -39,35 +39,6 @@ var COSTS = Object.freeze({
 });
 var ORDERED_TYPES = Object.freeze(["harvester", "attack", "guard", "rangedGuard", "builder", "healer"]);
 
-exports.run = function (spawn) {
-    if (!spawn || spawn.spawning) {
-        return;
-    }
-    var counts = getCounts();
-
-    loopTypes(0, 0);
-    loopTypes(400, 1);
-    loopTypes(600, 2);
-
-    function loopTypes(threshold, index) {
-        if (spawn.energy < threshold) {
-            return;
-        }
-        for (var i = 0; i < ORDERED_TYPES.length; i++) {
-            var type = ORDERED_TYPES[i],
-                typeInfo = TYPES_INFO[type],
-                c = typeInfo.counts[index];
-
-            if (counts[type] === undefined) {
-                counts[type] = 0;
-            }
-            if (counts[type] < c) {
-                return buildCreep(spawn, type, typeInfo.parts);
-            }
-        }
-    }
-};
-
 var buildCreep = exports.buildCreep = function (spawn, type, parts) {
     var id = Math.random().toString(32).substr(2, 8);
 
@@ -102,3 +73,34 @@ function getCounts() {
 
     return counts;
 }
+
+function loopTypes(spawn, counts, threshold, index) {
+    if (spawn.energy < threshold) {
+        return;
+    }
+
+    for (var i = 0; i < ORDERED_TYPES.length; i++) {
+        var type = ORDERED_TYPES[i],
+            typeInfo = TYPES_INFO[type],
+            c = typeInfo.counts[index];
+
+        if (counts[type] === undefined) {
+            counts[type] = 0;
+        }
+        if (counts[type] < c) {
+            buildCreep(spawn, type, typeInfo.parts);
+            return;
+        }
+    }
+}
+
+exports.run = function (spawn) {
+    if (!spawn || spawn.spawning) {
+        return;
+    }
+    var counts = getCounts();
+
+    loopTypes(spawn, counts, 0, 0);
+    loopTypes(spawn, counts, 400, 1);
+    loopTypes(spawn, counts, 600, 2);
+};

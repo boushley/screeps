@@ -1,5 +1,17 @@
 "use strict";
 
+// Determines if any body parts are completely damanged
+function isViable(creep) {
+    for (var i = 0; i < creep.body.length; i++) {
+        var part = creep.body[i];
+        if (part.hits < 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 module.exports = exports = function (creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     if (!isViable(creep)) {
@@ -30,15 +42,3 @@ module.exports = exports = function (creep) {
         creep.transferEnergy(spawn);
     }
 };
-
-// Determines if any body parts are completely damanged
-function isViable(creep) {
-    for (var i = 0; i < creep.body.length; i++) {
-        var part = creep.body[i];
-        if (part.hits < 1) {
-            return false;
-        }
-    }
-
-    return true;
-}

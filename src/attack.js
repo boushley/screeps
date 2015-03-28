@@ -1,3 +1,4 @@
+'use strict';
 module.exports = exports = function(creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     var target = spawn.pos.findClosest(Game.HOSTILE_CREEPS, {

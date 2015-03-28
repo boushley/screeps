@@ -18,6 +18,9 @@
   "homepage": "https://github.com/boushley/screeps",
   "devDependencies": {
     "broccoli": "^0.15.3",
-    "broccoli-babel-transpiler": "^4.0.1"
+    "broccoli-babel-transpiler": "^4.0.1",
+    "broccoli-eslint": "0.0.5"
+  },
+  "dependencies": {
   }
 }

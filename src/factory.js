@@ -1,3 +1,5 @@
+'use strict';
+
 let _ = require('lodash');
 
 const TYPES_INFO = Object.freeze({
@@ -31,38 +33,11 @@ const COSTS = Object.freeze({
     work: 20,
     carry: 50,
     attack: 80,
-    ranged_attack: 150,
+    'ranged_attack': 150,
     heal: 200,
     tough: 20
 });
 const ORDERED_TYPES = Object.freeze(['harvester', 'attack', 'guard', 'rangedGuard', 'builder', 'healer']);
-
-exports.run = function(spawn) {
-    if (!spawn || spawn.spawning) {
-        return;
-    }
-    let counts = getCounts();
-
-    loopTypes(0, 0);
-    loopTypes(400, 1);
-    loopTypes(600, 2);
-
-    function loopTypes(threshold, index) {
-        if (spawn.energy < threshold) { return; }
-        for (let i = 0; i < ORDERED_TYPES.length; i++) {
-            let type = ORDERED_TYPES[i],
-                typeInfo = TYPES_INFO[type],
-                c = typeInfo.counts[index];
-
-            if (counts[type] === undefined) {
-                counts[type] = 0;
-            }
-            if (counts[type] < c) {
-                return buildCreep(spawn, type, typeInfo.parts);
-            }
-        }
-    }
-};
 
 let buildCreep = exports.buildCreep = function(spawn, type, parts) {
     let id = Math.random().toString(32).substr(2, 8);
@@ -78,7 +53,7 @@ let buildCreep = exports.buildCreep = function(spawn, type, parts) {
     );
 
     if (result === Game.OK) {
-        console.log('Created', type+'-'+id);
+        console.log('Created', type + '-' + id);
     }
 };
 
@@ -104,3 +79,34 @@ function getCounts() {
 
     return counts;
 }
+
+function loopTypes(spawn, counts, threshold, index) {
+    if (spawn.energy < threshold) {
+        return;
+    }
+
+    for (let i = 0; i < ORDERED_TYPES.length; i++) {
+        let type = ORDERED_TYPES[i],
+            typeInfo = TYPES_INFO[type],
+            c = typeInfo.counts[index];
+
+        if (counts[type] === undefined) {
+            counts[type] = 0;
+        }
+        if (counts[type] < c) {
+            buildCreep(spawn, type, typeInfo.parts);
+            return;
+        }
+    }
+}
+
+exports.run = function(spawn) {
+    if (!spawn || spawn.spawning) {
+        return;
+    }
+    let counts = getCounts();
+
+    loopTypes(spawn, counts, 0, 0);
+    loopTypes(spawn, counts, 400, 1);
+    loopTypes(spawn, counts, 600, 2);
+};

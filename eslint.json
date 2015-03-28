@@ -1,0 +1,16 @@
+{
+  "env": {
+    "node": true
+  },
+  "globals": {
+    "Game": false,
+    "console": false,
+    "Memory": false
+  },
+  "rules": {
+    "quotes": [2, "single"],
+    "no-unused-expressions": 1,
+    "no-unused-vars": [2, "local"],
+    "no-use-before-define": [2, "nofunc"]
+  }
+}

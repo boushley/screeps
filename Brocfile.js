@@ -1,4 +1,6 @@
-var esTranspiler = require('broccoli-babel-transpiler');
-var scriptTree = esTranspiler('src', {});
+var scripts = 'src';
 
-module.exports = scriptTree;
+scripts = require('broccoli-eslint')(scripts, {config: './eslint.json'});
+scripts = require('broccoli-babel-transpiler')(scripts, {});
+
+module.exports = scripts;

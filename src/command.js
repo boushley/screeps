@@ -1,3 +1,5 @@
+'use strict';
+
 var harvest = require('harvest'),
     build = require('build'),
     guard = require('guard'),
