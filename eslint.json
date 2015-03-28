@@ -1,6 +1,7 @@
 {
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
   "globals": {
     "Game": false,
@@ -12,5 +13,10 @@
     "no-unused-expressions": 1,
     "no-unused-vars": [2, "local"],
     "no-use-before-define": [2, "nofunc"]
+  },
+  "ecmaFeatures": {
+    "arrowFunctions": true,
+    "blockBindings": true,
+    "forOf": true
   }
 }

@@ -19,7 +19,7 @@
   "devDependencies": {
     "broccoli": "^0.15.3",
     "broccoli-babel-transpiler": "^4.0.1",
-    "broccoli-eslint": "0.0.5"
+    "broccoli-eslint": "git@github.com:Dremora/broccoli-eslint.git#eslint-0.12"
   },
   "dependencies": {
   }
