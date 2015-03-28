@@ -1,7 +1,7 @@
 'use strict';
 
-let BaseRole = require('./base-role'),
-    c = require('../constants');
+let BaseRole = require('base-role'),
+    c = require('constants');
 
 class Guard extends BaseRole {
     constructor() {

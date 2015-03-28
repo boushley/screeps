@@ -2,7 +2,7 @@
 
 var harvest = require("harvest"),
     build = require("build"),
-    Guard = require("roles/guard"),
+    Guard = require("guard"),
     attack = require("attack"),
     heal = require("healer");
 
