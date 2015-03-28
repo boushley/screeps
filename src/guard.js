@@ -9,22 +9,39 @@ module.exports = exports = function(creep) {
 
     if (target) {
         if (creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0) {
-            if (target.pos.inRangeTo(creep.pos, 3)) {
+            let damageCanDeal = 0;
+            let inRangeEnemies = creep.pos.findInRange(Game.HOSTILE_CREEPS, 3);
+            inRangeEnemies.forEach((e) => {
+                let range = creep.pos.getRangeTo(e.pos);
+                if (range === 3) {
+                    damageCanDeal += 1;
+                } else if (range === 2) {
+                    damageCanDeal += 4;
+                } else if (range === 1) {
+                    damageCanDeal += 10;
+                }
+            });
+
+            if (damageCanDeal >= 10) {
+                creep.rangedMassAttack();
+            } else if (target.pos.inRangeTo(creep.pos, 3)) {
                 creep.rangedAttack(target);
             } else {
                 creep.moveTo(target);
             }
-        } else {
+
+            return;
+        } else if (creep.getActiveBodyparts(Game.ATTACK) > 0) {
             creep.moveTo(target);
             creep.attack(target);
+            return;
         }
-
-    } else {
-        var rallyPoint = spawn.pos;
-        if (Game.flags.BoushleyRally) {
-            rallyPoint = Game.flags.BoushleyRally.pos;
-        }
-
-        creep.moveTo(rallyPoint);
     }
+
+    var rallyPoint = spawn.pos;
+    if (Game.flags.BoushleyRally) {
+        rallyPoint = Game.flags.BoushleyRally.pos;
+    }
+
+    creep.moveTo(rallyPoint);
 };

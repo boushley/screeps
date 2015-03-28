@@ -29,7 +29,7 @@ module.exports = exports = function (creep) {
         }
 
         if (spawn.memory.targetSourceId) {
-            var source = Game.getObjectById(spawn.memory.targetSourceId);
+            let source = Game.getObjectById(spawn.memory.targetSourceId);
             if (source && source.energy > 10) {
                 creep.moveTo(source);
                 creep.harvest(source);
