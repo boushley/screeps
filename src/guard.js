@@ -2,9 +2,7 @@
 module.exports = exports = function(creep) {
     var spawn = Game.spawns[creep.memory.spawnName];
     var target = creep.pos.findClosest(Game.HOSTILE_CREEPS, {
-        filter: function(object) {
-            return object.pos.inRangeTo(spawn.pos, 12);
-        }
+        filter: h => h.pos.inRangeTo(spawn.pos, 12)
     });
 
     if (target) {

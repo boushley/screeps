@@ -3,7 +3,7 @@
 var _ = require("lodash");
 
 var TYPES_INFO = Object.freeze([{
-    counts: [1, 2],
+    counts: [1, 2, 3],
     type: "harvester",
     parts: [Game.WORK, Game.CARRY, Game.MOVE]
 }, {
@@ -12,19 +12,19 @@ var TYPES_INFO = Object.freeze([{
     parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }, {
     type: "builder",
-    counts: [0],
+    counts: [0, 0, 1],
     parts: [Game.WORK, Game.CARRY, Game.MOVE]
 }, {
     type: "healer",
-    counts: [0, 1],
+    counts: [0, 1, 2],
     parts: [Game.HEAL, Game.MOVE]
 }, {
     type: "rangedGuard",
-    counts: [1, 1, 2],
+    counts: [1, 1, 3],
     parts: [Game.RANGED_ATTACK, Game.MOVE]
 }, {
     type: "guard",
-    counts: [1, 2, 2],
+    counts: [1, 2, 3],
     parts: [Game.ATTACK, Game.MOVE]
 }]);
 var COSTS = Object.freeze({
@@ -100,4 +100,5 @@ exports.run = function (spawn) {
     loopTypes(spawn, counts, 0, 0);
     loopTypes(spawn, counts, 400, 1);
     loopTypes(spawn, counts, 600, 2);
+    loopTypes(spawn, counts, 800, 2);
 };
