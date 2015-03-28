@@ -41,5 +41,14 @@ module.exports = exports = function(creep) {
         rallyPoint = Game.flags.BoushleyRally.pos;
     }
 
-    creep.moveTo(rallyPoint);
+    var x = rallyPoint.x;
+    var y = rallyPoint.y;
+
+    if (creep.getActiveBodyparts(Game.ATTACK) > 0) {
+        y += 1;
+    } else {
+        y -= 1;
+    }
+
+    creep.moveTo(x, y);
 };
