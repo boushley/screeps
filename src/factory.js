@@ -1,7 +1,5 @@
 'use strict';
 
-let _ = require('lodash');
-
 const TYPES_INFO = Object.freeze([
     {
         counts: [1, 2, 2],
@@ -58,11 +56,16 @@ let buildCreep = exports.buildCreep = function(spawn, type, parts) {
     );
 
     if (result === Game.OK) {
-        console.log('Created', type + '-' + id);
+        console.log('Created', type + '-' + id, 'Cost:', calculateCost(parts));
     }
 };
 
 
+function calculateCost(parts) {
+    let cost = 0;
+
+    parts.forEach(p => cost += COSTS[p]);
+}
 
 function getCounts() {
     let counts = {};

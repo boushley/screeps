@@ -1,7 +1,5 @@
 "use strict";
 
-var _ = require("lodash");
-
 var TYPES_INFO = Object.freeze([{
     counts: [1, 2, 2],
     type: "harvester",
@@ -47,9 +45,17 @@ var buildCreep = exports.buildCreep = function (spawn, type, parts) {
     });
 
     if (result === Game.OK) {
-        console.log("Created", type + "-" + id);
+        console.log("Created", type + "-" + id, "Cost:", calculateCost(parts));
     }
 };
+
+function calculateCost(parts) {
+    var cost = 0;
+
+    parts.forEach(function (p) {
+        return cost += COSTS[p];
+    });
+}
 
 function getCounts() {
     var counts = {};

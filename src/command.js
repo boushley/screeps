@@ -1,8 +1,8 @@
 'use strict';
 
-var harvest = require('harvest'),
+let harvest = require('harvest'),
     build = require('build'),
-    guard = require('guard'),
+    Guard = require('roles/guard'),
     attack = require('attack'),
     heal = require('healer');
 
@@ -14,11 +14,13 @@ exports.run = function() {
         } else if (creep.memory.role === 'builder') {
             build(creep);
         } else if (creep.memory.role === 'guard') {
-            guard(creep);
+            let r = new Guard(creep);
+            r.run();
         } else if (creep.memory.role === 'attack') {
             attack(creep);
         } else if (creep.memory.role === 'rangedGuard') {
-            guard(creep);
+            let r = new Guard(creep);
+            r.run();
         } else if (creep.memory.role === 'healer') {
             heal(creep);
         }
