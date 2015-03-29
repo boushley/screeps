@@ -8,6 +8,7 @@ class Guard extends BaseRole {
         super(...arguments);
         this.isRangedActive = this.creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0;
         this.isMeleeActive = this.creep.getActiveBodyparts(Game.ATTACK) > 0;
+        this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
     }
 
     getRangedMassAttackDamage() {
@@ -20,6 +21,11 @@ class Guard extends BaseRole {
     }
 
     run() {
+        if (this.allWeaponsDamaged) {
+            this.creep.moveTo(this.spawn);
+            return;
+        }
+
         let target = this.creep.pos.findClosest(Game.HOSTILE_CREEPS, {
                 filter: h => h.pos.inRangeTo(this.spawn.pos, c.GUARD_RANGE)
             }),
@@ -65,8 +71,10 @@ class Guard extends BaseRole {
 
                 if (!hasMoved && canAttack) {
                     this.creep.move(defensiveDirection);
+                    hasMoved = true;
                 } else if (!hasMoved) {
                     this.creep.moveTo(target);
+                    hasMoved = true;
                 }
             }
         }

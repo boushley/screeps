@@ -18,6 +18,7 @@ var Guard = (function (_BaseRole) {
         _get(Object.getPrototypeOf(Guard.prototype), "constructor", this).apply(this, arguments);
         this.isRangedActive = this.creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0;
         this.isMeleeActive = this.creep.getActiveBodyparts(Game.ATTACK) > 0;
+        this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
     }
 
     _inherits(Guard, _BaseRole);
@@ -38,6 +39,11 @@ var Guard = (function (_BaseRole) {
         run: {
             value: function run() {
                 var _this = this;
+
+                if (this.allWeaponsDamaged) {
+                    this.creep.moveTo(this.spawn);
+                    return;
+                }
 
                 var target = this.creep.pos.findClosest(Game.HOSTILE_CREEPS, {
                     filter: function (h) {
@@ -86,8 +92,10 @@ var Guard = (function (_BaseRole) {
 
                         if (!hasMoved && canAttack) {
                             this.creep.move(defensiveDirection);
+                            hasMoved = true;
                         } else if (!hasMoved) {
                             this.creep.moveTo(target);
+                            hasMoved = true;
                         }
                     }
                 }
