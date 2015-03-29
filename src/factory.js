@@ -89,7 +89,7 @@ function getCounts() {
 }
 
 function loopTypes(spawn, counts, threshold, level) {
-    if (spawn.energy < threshold) {
+    if (spawn.energy < threshold || spawn.spawning) {
         return;
     }
 
