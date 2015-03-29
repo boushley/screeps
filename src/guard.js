@@ -49,3 +49,5 @@ class Guard extends BaseRole {
         }
     }
 }
+
+module.exports = Guard;

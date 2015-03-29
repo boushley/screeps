@@ -74,3 +74,5 @@ var Guard = (function (_BaseRole) {
 
     return Guard;
 })(BaseRole);
+
+module.exports = Guard;

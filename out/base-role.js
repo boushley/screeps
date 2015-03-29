@@ -39,3 +39,5 @@ var BaseRole = (function () {
 
     return BaseRole;
 })();
+
+module.exports = BaseRole;
