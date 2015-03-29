@@ -1,5 +1,7 @@
 'use strict';
 
+let counts = require('counts');
+
 const TYPES_INFO = Object.freeze([
     {
         counts: [1, 2, 2],
@@ -67,27 +69,6 @@ function calculateCost(parts) {
     parts.forEach(p => cost += COSTS[p]);
 }
 
-function getCounts() {
-    let counts = {};
-
-    for(let i in Game.creeps) {
-        let creep = Game.creeps[i];
-        if (!creep.my) {
-            continue;
-        }
-
-        let role = creep.memory.role;
-
-        if (counts[role] === undefined) {
-            counts[role] = 1;
-        } else {
-            counts[role] += 1;
-        }
-    }
-
-    return counts;
-}
-
 function loopTypes(spawn, counts, threshold, level) {
     if (spawn.energy < threshold || spawn.spawning) {
         return;
@@ -111,10 +92,9 @@ exports.run = function(spawn) {
     if (!spawn || spawn.spawning) {
         return;
     }
-    let counts = getCounts();
 
-    loopTypes(spawn, counts, 0, 0);
-    loopTypes(spawn, counts, 400, 1);
-    loopTypes(spawn, counts, 600, 2);
     loopTypes(spawn, counts, 800, 3);
+    loopTypes(spawn, counts, 600, 2);
+    loopTypes(spawn, counts, 400, 1);
+    loopTypes(spawn, counts, 0, 0);
 };
