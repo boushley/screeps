@@ -1,5 +1,7 @@
 "use strict";
 
+var counts = require("counts");
+
 var TYPES_INFO = Object.freeze([{
     counts: [1, 2, 2],
     type: "harvester",
@@ -15,7 +17,7 @@ var TYPES_INFO = Object.freeze([{
 }, {
     type: "healer",
     counts: [0, 1, 2],
-    parts: [Game.HEAL, Game.MOVE]
+    parts: [Game.MOVE, Game.HEAL]
 }, {
     type: "rangedGuard",
     counts: [1, 1, 3],
@@ -57,29 +59,8 @@ function calculateCost(parts) {
     });
 }
 
-function getCounts() {
-    var counts = {};
-
-    for (var i in Game.creeps) {
-        var creep = Game.creeps[i];
-        if (!creep.my) {
-            continue;
-        }
-
-        var role = creep.memory.role;
-
-        if (counts[role] === undefined) {
-            counts[role] = 1;
-        } else {
-            counts[role] += 1;
-        }
-    }
-
-    return counts;
-}
-
-function loopTypes(spawn, counts, threshold, level) {
-    if (spawn.energy < threshold) {
+function loopTypes(spawn, threshold, level) {
+    if (spawn.energy < threshold || spawn.spawning) {
         return;
     }
 
@@ -101,10 +82,9 @@ exports.run = function (spawn) {
     if (!spawn || spawn.spawning) {
         return;
     }
-    var counts = getCounts();
 
-    loopTypes(spawn, counts, 0, 0);
-    loopTypes(spawn, counts, 400, 1);
-    loopTypes(spawn, counts, 600, 2);
     loopTypes(spawn, counts, 800, 3);
+    loopTypes(spawn, counts, 600, 2);
+    loopTypes(spawn, counts, 400, 1);
+    loopTypes(spawn, counts, 0, 0);
 };

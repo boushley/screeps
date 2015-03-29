@@ -20,19 +20,28 @@ var BaseRole = (function () {
                     rallyPoint = Game.flags.BoushleyRally.pos;
                 }
 
-                var result = {
+                var newCoords = {
                     x: rallyPoint.x,
                     y: rallyPoint.y
                 };
 
                 // On this map up is the back-side direction
                 if (this.creep.getActiveBodyparts(Game.ATTACK) > 0) {
-                    result.y += 1;
+                    newCoords.y += 1;
                 } else {
-                    result.y -= 1;
+                    newCoords.y -= 1;
                 }
 
-                return result;
+                return this.creep.room.getPositionAt(newCoords.x, newCoords.y);
+            }
+        },
+        getDefensivePosition: {
+            value: function getDefensivePosition() {
+                return this.creep.pos.findClosest(Game.MY_STRUCTURES, {
+                    filter: function (s) {
+                        return s.structureType === Game.STRUCTURE_RAMPART;
+                    }
+                }).pos;
             }
         }
     });

@@ -21,7 +21,7 @@ const TYPES_INFO = Object.freeze([
     {
         type: 'healer',
         counts: [0, 1, 2],
-        parts: [Game.HEAL, Game.MOVE]
+        parts: [Game.MOVE, Game.HEAL]
     },
     {
         type: 'rangedGuard',
@@ -69,7 +69,7 @@ function calculateCost(parts) {
     parts.forEach(p => cost += COSTS[p]);
 }
 
-function loopTypes(spawn, counts, threshold, level) {
+function loopTypes(spawn, threshold, level) {
     if (spawn.energy < threshold || spawn.spawning) {
         return;
     }

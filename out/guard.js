@@ -43,30 +43,54 @@ var Guard = (function (_BaseRole) {
                     filter: function (h) {
                         return h.pos.inRangeTo(_this.spawn.pos, c.GUARD_RANGE);
                     }
-                });
+                }),
+                    pos = this.creep.pos,
+                    hasMoved = false;
 
                 if (target) {
-                    // TODO If someone has ranged and melee they should use melee if they
-                    // are in range
+                    var p = this.getDefensivePosition(),
+                        defensiveDirection = pos.getDirectionTo(p);
+
                     if (this.isRangedActive) {
-                        var massDamage = this.getRangedMassAttackDamage();
-                        if (massDamage >= c.RANGED_DAMAGE) {
-                            this.creep.rangedMassAttack();
-                        } else if (target.pos.inRangeTo(this.creep.pos, c.RANGED_RANGE)) {
-                            this.creep.rangedAttack(target);
+                        var massDamage = this.getRangedMassAttackDamage(),
+                            targetRange = pos.getRangeTo(target.pos),
+                            targetDirection = pos.getDirectionTo(target.pos),
+                            rangedDamage = undefined;
+
+                        if (targetRange <= c.RANGED_RANGE) {
+                            rangedDamage = 10;
                         } else {
-                            this.creep.moveTo(target);
+                            rangedDamage = 0;
                         }
 
-                        return;
-                    } else if (this.isMeleeActive) {
-                        this.creep.moveTo(target);
-                        this.creep.attack(target);
-                        return;
+                        if (massDamage >= rangedDamage && massDamage > 0) {
+                            this.creep.rangedMassAttack();
+                        } else if (rangedDamage > 0) {
+                            this.creep.rangedAttack(target);
+                        }
+
+                        if (targetRange < 3 || targetDirection === defensiveDirection) {
+                            this.creep.move(defensiveDirection);
+                            hasMoved = true;
+                        }
                     }
-                } else {
-                    var coords = this.getRally();
-                    this.creep.moveTo(coords.x, coords.y);
+
+                    if (this.isMeleeActive) {
+                        var canAttack = pos.isNearTo(target.pos);
+                        if (canAttack) {
+                            this.creep.attack(target);
+                        }
+
+                        if (!hasMoved && canAttack) {
+                            this.creep.move(defensiveDirection);
+                        } else if (!hasMoved) {
+                            this.creep.moveTo(target);
+                        }
+                    }
+                }
+
+                if (!hasMoved) {
+                    this.creep.moveTo(this.getRally());
                 }
             }
         }

@@ -20,32 +20,56 @@ class Guard extends BaseRole {
     }
 
     run() {
-        var target = this.creep.pos.findClosest(Game.HOSTILE_CREEPS, {
-            filter: h => h.pos.inRangeTo(this.spawn.pos, c.GUARD_RANGE)
-        });
+        let target = this.creep.pos.findClosest(Game.HOSTILE_CREEPS, {
+                filter: h => h.pos.inRangeTo(this.spawn.pos, c.GUARD_RANGE)
+            }),
+            pos = this.creep.pos,
+            hasMoved = false;
 
         if (target) {
-            // TODO If someone has ranged and melee they should use melee if they
-            // are in range
+            let p = this.getDefensivePosition(),
+                defensiveDirection = pos.getDirectionTo(p);
+
             if (this.isRangedActive) {
-                let massDamage = this.getRangedMassAttackDamage();
-                if (massDamage >= c.RANGED_DAMAGE) {
-                    this.creep.rangedMassAttack();
-                } else if (target.pos.inRangeTo(this.creep.pos, c.RANGED_RANGE)) {
-                    this.creep.rangedAttack(target);
+                let massDamage = this.getRangedMassAttackDamage(),
+                    targetRange = pos.getRangeTo(target.pos),
+                    targetDirection = pos.getDirectionTo(target.pos),
+                    rangedDamage;
+
+                if (targetRange <= c.RANGED_RANGE) {
+                    rangedDamage = 10;
                 } else {
-                    this.creep.moveTo(target);
+                    rangedDamage = 0;
                 }
 
-                return;
-            } else if (this.isMeleeActive) {
-                this.creep.moveTo(target);
-                this.creep.attack(target);
-                return;
+                if (massDamage >= rangedDamage && massDamage > 0) {
+                    this.creep.rangedMassAttack();
+                } else if (rangedDamage > 0) {
+                    this.creep.rangedAttack(target);
+                }
+
+                if (targetRange < 3 || targetDirection === defensiveDirection) {
+                    this.creep.move(defensiveDirection);
+                    hasMoved = true;
+                }
             }
-        } else {
-            let coords = this.getRally();
-            this.creep.moveTo(coords.x, coords.y);
+
+            if (this.isMeleeActive) {
+                let canAttack = pos.isNearTo(target.pos);
+                if (canAttack) {
+                    this.creep.attack(target);
+                }
+
+                if (!hasMoved && canAttack) {
+                    this.creep.move(defensiveDirection);
+                } else if (!hasMoved) {
+                    this.creep.moveTo(target);
+                }
+            }
+        }
+
+        if (!hasMoved) {
+            this.creep.moveTo(this.getRally());
         }
     }
 }
