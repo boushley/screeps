@@ -93,8 +93,8 @@ exports.run = function(spawn) {
         return;
     }
 
-    loopTypes(spawn, counts, 800, 3);
-    loopTypes(spawn, counts, 600, 2);
-    loopTypes(spawn, counts, 400, 1);
-    loopTypes(spawn, counts, 0, 0);
+    loopTypes(spawn, 800, 3);
+    loopTypes(spawn, 600, 2);
+    loopTypes(spawn, 400, 1);
+    loopTypes(spawn, 0, 0);
 };

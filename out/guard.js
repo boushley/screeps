@@ -72,6 +72,9 @@ var Guard = (function (_BaseRole) {
                         if (targetRange < 3 || targetDirection === defensiveDirection) {
                             this.creep.move(defensiveDirection);
                             hasMoved = true;
+                        } else if (targetRange > 3) {
+                            this.creep.move(targetDirection);
+                            hasMoved = true;
                         }
                     }
 
