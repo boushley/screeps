@@ -82,6 +82,8 @@ function loopTypes(spawn, threshold, level) {
             counts[typeInfo.type] = 0;
         }
         if (counts[typeInfo.type] < c) {
+            // TODO Build stronger creeps based on level, want to build some guards
+            // with tough, etc
             buildCreep(spawn, typeInfo.type, typeInfo.parts);
             return;
         }

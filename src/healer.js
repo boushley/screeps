@@ -1,28 +1,31 @@
 'use strict';
 
-module.exports = exports = function(creep) {
-    var spawn = Game.spawns[creep.memory.spawnName];
-    var target = creep.pos.findClosest(Game.MY_CREEPS, {
-        filter: function(object) {
-            return object.hits < object.hitsMax;
-        }
-    });
+let BaseRole = require('base-role');
 
-    if (target) {
-        if (creep.pos.isNearTo(target)) {
-            creep.heal(target);
-        } else if (creep.pos.inRangeTo(target, 3)) {
-            creep.rangedHeal(target);
-        } else {
-            creep.moveTo(target);
-        }
-    } else {
-        var rallyPoint = spawn.pos;
-        if (Game.flags.BoushleyRally) {
-            rallyPoint = Game.flags.BoushleyRally.pos;
-        }
-
-        creep.moveTo(rallyPoint);
+class Healer extends BaseRole {
+    constructor() {
+        super(...arguments);
     }
 
-};
+    run() {
+        var target = this.creep.pos.findClosest(Game.MY_CREEPS, {
+            filter: function(object) {
+                return object.hits < object.hitsMax;
+            }
+        });
+
+        if (target) {
+            if (this.creep.pos.isNearTo(target)) {
+                this.creep.heal(target);
+            } else if (this.creep.pos.inRangeTo(target, 3)) {
+                this.creep.rangedHeal(target);
+            } else {
+                this.creep.moveTo(target);
+            }
+        } else {
+            this.creep.moveTo(this.getRally());
+        }
+    }
+}
+
+module.exports = Healer;

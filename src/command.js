@@ -1,18 +1,20 @@
 'use strict';
 
-let harvest = require('harvest'),
-    build = require('build'),
+let Harvester = require('harvester'),
+    Builder = require('builder'),
     Guard = require('guard'),
     attack = require('attack'),
-    heal = require('healer');
+    Healer = require('healer');
 
 exports.run = function() {
     for (var i in Game.creeps) {
         var creep = Game.creeps[i];
         if (creep.memory.role === 'harvester') {
-            harvest(creep);
+            let r = new Harvester(creep);
+            r.run();
         } else if (creep.memory.role === 'builder') {
-            build(creep);
+            let r = new Builder(creep);
+            r.run();
         } else if (creep.memory.role === 'guard') {
             let r = new Guard(creep);
             r.run();
@@ -22,7 +24,8 @@ exports.run = function() {
             let r = new Guard(creep);
             r.run();
         } else if (creep.memory.role === 'healer') {
-            heal(creep);
+            let r = new Healer(creep);
+            r.run();
         }
     }
 };
