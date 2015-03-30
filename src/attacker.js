@@ -7,7 +7,7 @@ class Attacker extends BaseRole {
         super(...arguments);
     }
 
-    static getKey() {
+    static k() {
         return 'attacker';
     }
 
@@ -47,6 +47,6 @@ Attacker.LEVEL_INFO = Object.freeze([
     }
 ]);
 
-Attacker.registerType(Attacker.getKey(), Attacker);
+Attacker.registerType(Attacker.k(), Attacker);
 
 module.exports = Attacker;

@@ -7,7 +7,7 @@ class Healer extends BaseRole {
         super(...arguments);
     }
 
-    static getKey() {
+    static k() {
         return 'healer';
     }
 
@@ -51,6 +51,6 @@ Healer.LEVEL_INFO = Object.freeze([
     }
 ]);
 
-Healer.registerType(Healer.getKey(), Healer);
+Healer.registerType(Healer.k(), Healer);
 
 module.exports = Healer;

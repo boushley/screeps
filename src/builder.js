@@ -7,7 +7,7 @@ class Builder extends Harvester {
         super(...arguments);
     }
 
-    static getKey() {
+    static k() {
         return 'builder';
     }
 
@@ -68,6 +68,6 @@ Builder.LEVEL_INFO = Object.freeze([
     }
 ]);
 
-Builder.registerType(Builder.getKey(), Builder);
+Builder.registerType(Builder.k(), Builder);
 
 module.exports = Builder;

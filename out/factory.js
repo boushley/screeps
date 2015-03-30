@@ -40,7 +40,7 @@ function loopTypes(spawn, threshold, level) {
     for (var i = 0; i < ORDERED_TYPES.length; i++) {
         var type = ORDERED_TYPES[i],
             _c = type.getCount(level),
-            typeKey = type.getKey();
+            typeKey = type.k();
 
         if (counts[typeKey] === undefined) {
             counts[typeKey] = 0;
