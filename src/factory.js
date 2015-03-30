@@ -49,7 +49,7 @@ function loopTypes(spawn, threshold, level) {
     for (let i = 0; i < ORDERED_TYPES.length; i++) {
         let type = ORDERED_TYPES[i],
             c = type.getCount(level),
-            typeKey = type.k();
+            typeKey = type.key();
 
         if (counts[typeKey] === undefined) {
             counts[typeKey] = 0;
