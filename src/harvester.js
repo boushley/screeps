@@ -7,7 +7,7 @@ class Harvester extends BaseRole {
         super(...arguments);
     }
 
-    static getkey() {
+    static k() {
         return 'harvester';
     }
 
@@ -72,6 +72,6 @@ Harvester.LEVEL_INFO = Object.freeze([
     }
 ]);
 
-Harvester.registerType(Harvester.getKey(), Harvester);
+Harvester.registerType(Harvester.k(), Harvester);
 
 module.exports = Harvester;
