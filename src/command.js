@@ -8,7 +8,7 @@ exports.run = function() {
             Role = roleMapper.getType(creep.memory.role);
 
         if (Role) {
-            let r = new Role();
+            let r = new Role(creep);
             r.run();
         }
     }
