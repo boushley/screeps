@@ -1,48 +1,20 @@
 'use strict';
 
-let counts = require('counts');
+let counts = require('counts'),
+    c = require('constants'),
+    Harvester = require('harvester'),
+    Attacker = require('attacker'),
+    Builder = require('builder'),
+    Healer = require('healer'),
+    Guard = require('guard');
 
-const TYPES_INFO = Object.freeze([
-    {
-        counts: [1, 2, 2],
-        type: 'harvester',
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        type: 'attack',
-        counts: [0],
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        type: 'builder',
-        counts: [0, 0, 1],
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        type: 'healer',
-        counts: [0, 1, 2],
-        parts: [Game.MOVE, Game.HEAL]
-    },
-    {
-        type: 'rangedGuard',
-        counts: [1, 1, 3],
-        parts: [Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        type: 'guard',
-        counts: [1, 2, 3],
-        parts: [Game.ATTACK, Game.MOVE]
-    }
+const ORDERED_TYPES = Object.freeze([
+    Harvester,
+    Attacker,
+    Builder,
+    Healer,
+    Guard
 ]);
-const COSTS = Object.freeze({
-    move: 50,
-    work: 20,
-    carry: 50,
-    attack: 80,
-    'ranged_attack': 150,
-    heal: 200,
-    tough: 20
-});
 
 let buildCreep = exports.buildCreep = function(spawn, type, parts) {
     let id = Math.random().toString(32).substr(2, 8);
@@ -66,7 +38,7 @@ let buildCreep = exports.buildCreep = function(spawn, type, parts) {
 function calculateCost(parts) {
     let cost = 0;
 
-    parts.forEach(p => cost += COSTS[p]);
+    parts.forEach(p => cost += c.PART_COST[p]);
 }
 
 function loopTypes(spawn, threshold, level) {
@@ -74,17 +46,16 @@ function loopTypes(spawn, threshold, level) {
         return;
     }
 
-    for (let i = 0; i < TYPES_INFO.length; i++) {
-        let typeInfo = TYPES_INFO[i],
-            c = typeInfo.counts[level];
+    for (let i = 0; i < ORDERED_TYPES.length; i++) {
+        let type = ORDERED_TYPES[i],
+            c = type.getCount(level),
+            typeKey = type.getKey();
 
-        if (counts[typeInfo.type] === undefined) {
-            counts[typeInfo.type] = 0;
+        if (counts[typeKey] === undefined) {
+            counts[typeKey] = 0;
         }
-        if (counts[typeInfo.type] < c) {
-            // TODO Build stronger creeps based on level, want to build some guards
-            // with tough, etc
-            buildCreep(spawn, typeInfo.type, typeInfo.parts);
+        if (counts[typeKey] < c) {
+            buildCreep(spawn, typeKey, type.getParts(level));
             return;
         }
     }

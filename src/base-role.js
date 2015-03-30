@@ -1,8 +1,26 @@
 'use strict';
+
 class BaseRole {
     constructor(creep) {
         this.creep = creep;
         this.spawn = Game.spawns[creep.memory.spawnName];
+    }
+
+    static getCount(level) {
+        return this.LEVEL_INFO[level || 0].count;
+    }
+
+    static getParts(level) {
+        return this.LEVEL_INFO[level || 0].parts;
+    }
+
+    static registerType(typeKey, type) {
+        this.typeMap = this.typeMap || {};
+        this.typeMap[typeKey] = type;
+    }
+
+    static getType(typeKey) {
+        return this.typeMap[typeKey];
     }
 
     getRally() {
@@ -32,6 +50,5 @@ class BaseRole {
         }).pos;
     }
 }
-
 
 module.exports = BaseRole;

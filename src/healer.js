@@ -7,6 +7,10 @@ class Healer extends BaseRole {
         super(...arguments);
     }
 
+    static getKey() {
+        return 'healer';
+    }
+
     run() {
         var target = this.creep.pos.findClosest(Game.MY_CREEPS, {
             filter: function(object) {
@@ -27,5 +31,26 @@ class Healer extends BaseRole {
         }
     }
 }
+
+Healer.LEVEL_INFO = Object.freeze([
+    {
+        count: 0,
+        parts: [Game.MOVE, Game.HEAL]
+    },
+    {
+        count: 1,
+        parts: [Game.MOVE, Game.HEAL]
+    },
+    {
+        count: 2,
+        parts: [Game.MOVE, Game.HEAL]
+    },
+    {
+        count: 2,
+        parts: [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL]
+    }
+]);
+
+Healer.registerType(Healer.getKey(), Healer);
 
 module.exports = Healer;

@@ -105,9 +105,31 @@ var Guard = (function (_BaseRole) {
                 }
             }
         }
+    }, {
+        getKey: {
+            value: function getKey() {
+                return "guard";
+            }
+        }
     });
 
     return Guard;
 })(BaseRole);
+
+Guard.LEVEL_INFO = Object.freeze([{
+    count: 1,
+    parts: [Game.RANGED_ATTACK, Game.MOVE]
+}, {
+    count: 1,
+    parts: [Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
+}, {
+    count: 2,
+    parts: [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
+}, {
+    count: 3,
+    parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
+}]);
+
+Guard.registerType(Guard.getKey(), Guard);
 
 module.exports = Guard;

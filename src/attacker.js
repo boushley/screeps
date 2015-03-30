@@ -7,6 +7,10 @@ class Attacker extends BaseRole {
         super(...arguments);
     }
 
+    static getKey() {
+        return 'attacker';
+    }
+
     run() {
         let target = this.spawn.pos.findClosest(Game.HOSTILE_CREEPS, {
             filter: c => {
@@ -23,3 +27,26 @@ class Attacker extends BaseRole {
         }
     }
 }
+
+Attacker.LEVEL_INFO = Object.freeze([
+    {
+        count: 0,
+        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 0,
+        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 0,
+        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 0,
+        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
+    }
+]);
+
+Attacker.registerType(Attacker.getKey(), Attacker);
+
+module.exports = Attacker;

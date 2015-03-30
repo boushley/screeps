@@ -11,6 +11,10 @@ class Guard extends BaseRole {
         this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
     }
 
+    static getKey() {
+        return 'guard';
+    }
+
     getRangedMassAttackDamage() {
         let damageCanDeal = 0;
         this.creep.pos.findInRange(Game.HOSTILE_CREEPS, c.RANGED_RANGE).forEach(e => {
@@ -84,5 +88,26 @@ class Guard extends BaseRole {
         }
     }
 }
+
+Guard.LEVEL_INFO = Object.freeze([
+    {
+        count: 1,
+        parts: [Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 1,
+        parts: [Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 2,
+        parts: [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
+    },
+    {
+        count: 3,
+        parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
+    }
+]);
+
+Guard.registerType(Guard.getKey(), Guard);
 
 module.exports = Guard;

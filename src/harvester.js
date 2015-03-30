@@ -7,6 +7,10 @@ class Harvester extends BaseRole {
         super(...arguments);
     }
 
+    static getkey() {
+        return 'harvester';
+    }
+
     isViable() {
         for (var i = 0; i < this.creep.body.length; i++) {
             var part = this.creep.body[i];
@@ -48,5 +52,26 @@ class Harvester extends BaseRole {
         }
     }
 }
+
+Harvester.LEVEL_INFO = Object.freeze([
+    {
+        count: 1,
+        parts: [Game.WORK, Game.CARRY, Game.MOVE]
+    },
+    {
+        count: 2,
+        parts: [Game.WORK, Game.CARRY, Game.MOVE]
+    },
+    {
+        count: 2,
+        parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
+    },
+    {
+        count: 2,
+        parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
+    }
+]);
+
+Harvester.registerType(Harvester.getKey(), Harvester);
 
 module.exports = Harvester;

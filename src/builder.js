@@ -7,6 +7,10 @@ class Builder extends Harvester {
         super(...arguments);
     }
 
+    static getKey() {
+        return 'builder';
+    }
+
     handleTarget(target, isRepair) {
         if (this.creep.energy === 0) {
             this.creep.moveTo(this.spawn);
@@ -25,7 +29,7 @@ class Builder extends Harvester {
 
     run() {
         if (this.spawn.energy < 200) {
-            super();
+            super.run();
         } else {
             var buildTarget = this.spawn.pos.findClosest(Game.CONSTRUCTION_SITES, {
                 filter: s => s.my
@@ -39,10 +43,31 @@ class Builder extends Harvester {
             } else if (repairTarget) {
                 this.handleTarget(repairTarget, true);
             } else {
-                super();
+                super.run();
             }
         }
     }
 }
+
+Builder.LEVEL_INFO = Object.freeze([
+    {
+        count: 0,
+        parts: [Game.WORK, Game.CARRY, Game.MOVE]
+    },
+    {
+        count: 0,
+        parts: [Game.WORK, Game.CARRY, Game.MOVE]
+    },
+    {
+        count: 1,
+        parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
+    },
+    {
+        count: 1,
+        parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
+    }
+]);
+
+Builder.registerType(Builder.getKey(), Builder);
 
 module.exports = Builder;

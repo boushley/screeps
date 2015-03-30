@@ -10,62 +10,58 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var BaseRole = require("base-role");
 
-var Healer = (function (_BaseRole) {
-    function Healer() {
-        _classCallCheck(this, Healer);
+var Attacker = (function (_BaseRole) {
+    function Attacker() {
+        _classCallCheck(this, Attacker);
 
-        _get(Object.getPrototypeOf(Healer.prototype), "constructor", this).apply(this, arguments);
+        _get(Object.getPrototypeOf(Attacker.prototype), "constructor", this).apply(this, arguments);
     }
 
-    _inherits(Healer, _BaseRole);
+    _inherits(Attacker, _BaseRole);
 
-    _createClass(Healer, {
+    _createClass(Attacker, {
         run: {
             value: function run() {
-                var target = this.creep.pos.findClosest(Game.MY_CREEPS, {
-                    filter: function filter(object) {
-                        return object.hits < object.hitsMax;
+                var target = this.spawn.pos.findClosest(Game.HOSTILE_CREEPS, {
+                    filter: function (c) {
+                        var hasAttack = c.getActiveBodyparts(Game.ATTACK) === 0,
+                            hasHeal = c.getActiveBodyparts(Game.HEAL) === 0,
+                            hasRangedAttack = c.getActiveBodyparts(Game.RANGED_ATTACK) === 0;
+                        return hasAttack || hasHeal || hasRangedAttack;
                     }
                 });
 
                 if (target) {
-                    if (this.creep.pos.isNearTo(target)) {
-                        this.creep.heal(target);
-                    } else if (this.creep.pos.inRangeTo(target, 3)) {
-                        this.creep.rangedHeal(target);
-                    } else {
-                        this.creep.moveTo(target);
-                    }
-                } else {
-                    this.creep.moveTo(this.getRally());
+                    this.creep.moveTo(target);
+                    this.creep.attack(target);
                 }
             }
         }
     }, {
         getKey: {
             value: function getKey() {
-                return "healer";
+                return "attacker";
             }
         }
     });
 
-    return Healer;
+    return Attacker;
 })(BaseRole);
 
-Healer.LEVEL_INFO = Object.freeze([{
+Attacker.LEVEL_INFO = Object.freeze([{
     count: 0,
-    parts: [Game.MOVE, Game.HEAL]
+    parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }, {
-    count: 1,
-    parts: [Game.MOVE, Game.HEAL]
+    count: 0,
+    parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }, {
-    count: 2,
-    parts: [Game.MOVE, Game.HEAL]
+    count: 0,
+    parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }, {
-    count: 2,
-    parts: [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL]
+    count: 0,
+    parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }]);
 
-Healer.registerType(Healer.getKey(), Healer);
+Attacker.registerType(Attacker.getKey(), Attacker);
 
-module.exports = Healer;
+module.exports = Attacker;
