@@ -64,8 +64,8 @@ var Builder = (function (_Harvester) {
             }
         }
     }, {
-        k: {
-            value: function k() {
+        key: {
+            value: function key() {
                 return "builder";
             }
         }
@@ -87,7 +87,5 @@ Builder.LEVEL_INFO = Object.freeze([{
     count: 1,
     parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
 }]);
-
-Builder.registerType(Builder.k(), Builder);
 
 module.exports = Builder;

@@ -7,7 +7,7 @@ class Harvester extends BaseRole {
         super(...arguments);
     }
 
-    static k() {
+    static key() {
         return 'harvester';
     }
 
@@ -71,7 +71,5 @@ Harvester.LEVEL_INFO = Object.freeze([
         parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
     }
 ]);
-
-Harvester.registerType(Harvester.k(), Harvester);
 
 module.exports = Harvester;

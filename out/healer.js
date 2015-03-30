@@ -42,8 +42,8 @@ var Healer = (function (_BaseRole) {
             }
         }
     }, {
-        k: {
-            value: function k() {
+        key: {
+            value: function key() {
                 return "healer";
             }
         }
@@ -65,7 +65,5 @@ Healer.LEVEL_INFO = Object.freeze([{
     count: 2,
     parts: [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL]
 }]);
-
-Healer.registerType(Healer.k(), Healer);
 
 module.exports = Healer;

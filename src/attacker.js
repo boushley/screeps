@@ -7,7 +7,7 @@ class Attacker extends BaseRole {
         super(...arguments);
     }
 
-    static k() {
+    static key() {
         return 'attacker';
     }
 
@@ -46,7 +46,5 @@ Attacker.LEVEL_INFO = Object.freeze([
         parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
     }
 ]);
-
-Attacker.registerType(Attacker.k(), Attacker);
 
 module.exports = Attacker;

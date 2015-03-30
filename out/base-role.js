@@ -54,17 +54,6 @@ var BaseRole = (function () {
             value: function getParts(level) {
                 return this.LEVEL_INFO[level || 0].parts;
             }
-        },
-        registerType: {
-            value: function registerType(typeKey, type) {
-                this.typeMap = this.typeMap || {};
-                this.typeMap[typeKey] = type;
-            }
-        },
-        getType: {
-            value: function getType(typeKey) {
-                return this.typeMap[typeKey];
-            }
         }
     });
 

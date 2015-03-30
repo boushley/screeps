@@ -7,7 +7,7 @@ class Builder extends Harvester {
         super(...arguments);
     }
 
-    static k() {
+    static key() {
         return 'builder';
     }
 
@@ -67,7 +67,5 @@ Builder.LEVEL_INFO = Object.freeze([
         parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
     }
 ]);
-
-Builder.registerType(Builder.k(), Builder);
 
 module.exports = Builder;

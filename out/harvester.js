@@ -64,8 +64,8 @@ var Harvester = (function (_BaseRole) {
             }
         }
     }, {
-        k: {
-            value: function k() {
+        key: {
+            value: function key() {
                 return "harvester";
             }
         }
@@ -87,7 +87,5 @@ Harvester.LEVEL_INFO = Object.freeze([{
     count: 2,
     parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
 }]);
-
-Harvester.registerType(Harvester.k(), Harvester);
 
 module.exports = Harvester;

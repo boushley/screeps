@@ -11,7 +11,7 @@ class Guard extends BaseRole {
         this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
     }
 
-    static k() {
+    static key() {
         return 'guard';
     }
 
@@ -107,7 +107,5 @@ Guard.LEVEL_INFO = Object.freeze([
         parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
     }
 ]);
-
-Guard.registerType(Guard.k(), Guard);
 
 module.exports = Guard;

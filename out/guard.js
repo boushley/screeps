@@ -106,8 +106,8 @@ var Guard = (function (_BaseRole) {
             }
         }
     }, {
-        k: {
-            value: function k() {
+        key: {
+            value: function key() {
                 return "guard";
             }
         }
@@ -129,7 +129,5 @@ Guard.LEVEL_INFO = Object.freeze([{
     count: 3,
     parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
 }]);
-
-Guard.registerType(Guard.k(), Guard);
 
 module.exports = Guard;

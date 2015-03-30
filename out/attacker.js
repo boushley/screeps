@@ -38,8 +38,8 @@ var Attacker = (function (_BaseRole) {
             }
         }
     }, {
-        k: {
-            value: function k() {
+        key: {
+            value: function key() {
                 return "attacker";
             }
         }
@@ -61,7 +61,5 @@ Attacker.LEVEL_INFO = Object.freeze([{
     count: 0,
     parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
 }]);
-
-Attacker.registerType(Attacker.k(), Attacker);
 
 module.exports = Attacker;

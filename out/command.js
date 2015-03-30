@@ -1,11 +1,11 @@
 "use strict";
 
-var BaseRole = require("base-role");
+var roleMapper = require("role-mapper");
 
 exports.run = function () {
     for (var i in Game.creeps) {
         var creep = Game.creeps[i],
-            Role = BaseRole.getType(creep.memory.role);
+            Role = roleMapper.getType(creep.memory.role);
 
         if (Role) {
             var r = new Role();

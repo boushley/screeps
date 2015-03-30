@@ -14,15 +14,6 @@ class BaseRole {
         return this.LEVEL_INFO[level || 0].parts;
     }
 
-    static registerType(typeKey, type) {
-        this.typeMap = this.typeMap || {};
-        this.typeMap[typeKey] = type;
-    }
-
-    static getType(typeKey) {
-        return this.typeMap[typeKey];
-    }
-
     getRally() {
         let rallyPoint = this.spawn.pos;
         if (Game.flags.BoushleyRally) {
