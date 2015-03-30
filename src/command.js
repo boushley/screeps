@@ -3,28 +3,28 @@
 let Harvester = require('harvester'),
     Builder = require('builder'),
     Guard = require('guard'),
-    attack = require('attack'),
+    Attacker = require('attacker'),
     Healer = require('healer');
 
 exports.run = function() {
     for (var i in Game.creeps) {
-        var creep = Game.creeps[i];
+        var creep = Game.creeps[i],
+            r;
         if (creep.memory.role === 'harvester') {
-            let r = new Harvester(creep);
-            r.run();
+            r = new Harvester(creep);
         } else if (creep.memory.role === 'builder') {
-            let r = new Builder(creep);
-            r.run();
+            r = new Builder(creep);
         } else if (creep.memory.role === 'guard') {
-            let r = new Guard(creep);
-            r.run();
+            r = new Guard(creep);
         } else if (creep.memory.role === 'attack') {
-            attack(creep);
+            r = new Attacker(creep);
         } else if (creep.memory.role === 'rangedGuard') {
-            let r = new Guard(creep);
-            r.run();
+            r = new Guard(creep);
         } else if (creep.memory.role === 'healer') {
-            let r = new Healer(creep);
+            r = new Healer(creep);
+        }
+
+        if (r) {
             r.run();
         }
     }
