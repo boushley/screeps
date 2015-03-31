@@ -14,7 +14,7 @@ let buildCreep = exports.buildCreep = function(strategy) {
 
     let result = strategy.createCreep(buildInfo.parts, name, buildInfo.memory);
 
-    if (result === Game.OK) {
+    if (typeof result === 'string') {
         console.log('Created:', JSON.stringify(buildInfo), 'Cost:', calculateCost(buildInfo.parts));
     } else {
         console.log('Failed to Create code:', result);
