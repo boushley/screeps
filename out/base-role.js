@@ -12,6 +12,7 @@ var BaseRole = (function () {
 
         this.creep = creep;
         this.spawn = Game.spawns[creep.memory.spawnName];
+        this.memory = creep.memory;
     }
 
     _createClass(BaseRole, {
