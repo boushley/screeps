@@ -50,7 +50,7 @@ var GoalClosestHarvest = (function (_GoalBase) {
                 var key = Harvester.key(),
                     harvesterCount = counts[key];
 
-                return harvesterCount < 3;
+                return harvesterCount >= 3;
             }
         }
     });

@@ -13,7 +13,7 @@ class GoalClosestHarvest extends GoalBase {
         let key = Harvester.key(),
             harvesterCount = counts[key];
 
-        return harvesterCount < 3;
+        return harvesterCount >= 3;
     }
 
     getCreepToBuild() {
