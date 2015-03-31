@@ -16,18 +16,26 @@ class GoalClosestHarvest extends GoalBase {
         return harvesterCount >= 3;
     }
 
-    getCreepToBuild() {
-        var s = this.spawn.pos.findClosest(Game.SOURCES, {
-            filter: function(source) {
-                return source.energy > 20;
-            }
-        });
+    constructor(...args) {
+        super(...args);
 
+        if (!this.memory.targetSourceId) {
+            var s = this.spawn.pos.findClosest(Game.SOURCES, {
+                filter: function(source) {
+                    return source.energy > 20;
+                }
+            });
+            this.memory.targetSourceId = s.id;
+        }
+
+    }
+
+    getCreepToBuild() {
         return {
             parts: [Game.WORK, Game.CARRY, Game.MOVE],
             memory: {
                 role: Harvester.key(),
-                targetSourceId: s.id
+                targetSourceId: this.memory.targetSourceId
             }
         };
     }
