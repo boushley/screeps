@@ -29,3 +29,5 @@ class SpawnStrategy {
         return this.spawn.createCreep(parts, name, memory);
     }
 }
+
+module.exports = SpawnStrategy;
