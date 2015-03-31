@@ -2,9 +2,15 @@
 
 var factory = require("factory"),
     command = require("command"),
-    SpawnStrategy = require("spawn-strategy");
+    SpawnStrategy = require("spawn-strategy"),
+    memoryCleaner = require("memory-cleaner");
 
-var strategy = new SpawnStrategy(Game.spawns.Spawn1);
+var rootSpawn = Game.spawns.Spawn1;
+if (rootSpawn) {
+    memoryCleaner(rootSpawn.id);
 
-factory.run(strategy);
-command.run();
+    var strategy = new SpawnStrategy(rootSpawn);
+
+    factory.run(strategy);
+    command.run();
+}
