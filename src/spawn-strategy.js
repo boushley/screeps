@@ -3,8 +3,26 @@
 class SpawnStrategy {
     constructor(spawn) {
         this.spawn = spawn;
-        this.memory = {};
-        Memory.strategy = this.memory;
+
+        if (!Memory.strategy) {
+            Memory.strategy = {};
+        }
+        this.memory = Memory.strategy;
+
+        if (!this.memory.goalMemories) {
+            this.memory.goalMemories = {};
+        }
+
+        for (let GoalClass of PROGRESSIVE_GOALS) {
+            if (!GoalClass.isComplete()) {
+                let goalKey = GoalClass.key();
+                if (!this.memory.goalMemories[goalKey]) {
+                    this.memory.goalMemories[goalKey] = {};
+                }
+                this.goal = new GoalClass(this.memory.goalMemories[goalKey], this.spawn);
+                break;
+            }
+        }
     }
 
     isSpawnReady(thresholdEnergy) {
@@ -28,6 +46,15 @@ class SpawnStrategy {
 
         return this.spawn.createCreep(parts, name, memory);
     }
+
+    getCreepToBuild() {
+        return this.goal.getCreepToBuild();
+    }
 }
 
 module.exports = SpawnStrategy;
+
+const PROGRESSIVE_GOALS = Object.freeze([
+    require('goal-closest-harvest'),
+    require('goal-close-guards')
+]);

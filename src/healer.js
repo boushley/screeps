@@ -3,10 +3,6 @@
 let BaseRole = require('base-role');
 
 class Healer extends BaseRole {
-    constructor() {
-        super(...arguments);
-    }
-
     static key() {
         return 'healer';
     }
@@ -35,24 +31,5 @@ class Healer extends BaseRole {
         }
     }
 }
-
-Healer.LEVEL_INFO = Object.freeze([
-    {
-        count: 0,
-        parts: [Game.MOVE, Game.HEAL]
-    },
-    {
-        count: 1,
-        parts: [Game.MOVE, Game.HEAL]
-    },
-    {
-        count: 2,
-        parts: [Game.MOVE, Game.HEAL]
-    },
-    {
-        count: 2,
-        parts: [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL]
-    }
-]);
 
 module.exports = Healer;

@@ -1,13 +1,19 @@
 'use strict';
 
+let counts = require('counts');
+
 class BaseRole {
     constructor(creep) {
         this.creep = creep;
         this.spawn = Game.spawns[creep.memory.spawnName];
     }
 
-    static getCount(level) {
-        return this.LEVEL_INFO[level || 0].count;
+    static wantsToBuild(level) {
+        let want = this.LEVEL_INFO[level || 0].count || 0,
+            typeKey = this.key(),
+            have = counts[typeKey] || 0;
+
+        return want < have;
     }
 
     static getCreep(level) {

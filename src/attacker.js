@@ -3,10 +3,6 @@
 let BaseRole = require('base-role');
 
 class Attacker extends BaseRole {
-    constructor() {
-        super(...arguments);
-    }
-
     static key() {
         return 'attacker';
     }
@@ -27,24 +23,5 @@ class Attacker extends BaseRole {
         }
     }
 }
-
-Attacker.LEVEL_INFO = Object.freeze([
-    {
-        count: 0,
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 0,
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 0,
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 0,
-        parts: [Game.ATTACK, Game.RANGED_ATTACK, Game.MOVE]
-    }
-]);
 
 module.exports = Attacker;

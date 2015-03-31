@@ -4,6 +4,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+var counts = require("counts");
+
 var BaseRole = (function () {
     function BaseRole(creep) {
         _classCallCheck(this, BaseRole);
@@ -45,9 +47,13 @@ var BaseRole = (function () {
             }
         }
     }, {
-        getCount: {
-            value: function getCount(level) {
-                return this.LEVEL_INFO[level || 0].count;
+        wantsToBuild: {
+            value: function wantsToBuild(level) {
+                var want = this.LEVEL_INFO[level || 0].count || 0,
+                    typeKey = this.key(),
+                    have = counts[typeKey] || 0;
+
+                return want < have;
             }
         },
         getCreep: {

@@ -4,8 +4,8 @@ let BaseRole = require('base-role'),
     c = require('constants');
 
 class Guard extends BaseRole {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.isRangedActive = this.creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0;
         this.isMeleeActive = this.creep.getActiveBodyparts(Game.ATTACK) > 0;
         this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
@@ -88,24 +88,5 @@ class Guard extends BaseRole {
         }
     }
 }
-
-Guard.LEVEL_INFO = Object.freeze([
-    {
-        count: 1,
-        parts: [Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 1,
-        parts: [Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 2,
-        parts: [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
-    },
-    {
-        count: 3,
-        parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
-    }
-]);
 
 module.exports = Guard;

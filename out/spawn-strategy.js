@@ -9,8 +9,47 @@ var SpawnStrategy = (function () {
         _classCallCheck(this, SpawnStrategy);
 
         this.spawn = spawn;
-        this.memory = {};
-        Memory.strategy = this.memory;
+
+        if (!Memory.strategy) {
+            Memory.strategy = {};
+        }
+        this.memory = Memory.strategy;
+
+        if (!this.memory.goalMemories) {
+            this.memory.goalMemories = {};
+        }
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+            for (var _iterator = PROGRESSIVE_GOALS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var GoalClass = _step.value;
+
+                if (!GoalClass.isComplete()) {
+                    var goalKey = GoalClass.key();
+                    if (!this.memory.goalMemories[goalKey]) {
+                        this.memory.goalMemories[goalKey] = {};
+                    }
+                    this.goal = new GoalClass(this.memory.goalMemories[goalKey], this.spawn);
+                    break;
+                }
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator["return"]) {
+                    _iterator["return"]();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
+        }
     }
 
     _createClass(SpawnStrategy, {
@@ -37,8 +76,17 @@ var SpawnStrategy = (function () {
 
                 return this.spawn.createCreep(parts, name, memory);
             }
+        },
+        getCreepToBuild: {
+            value: function getCreepToBuild() {
+                return this.goal.getCreepToBuild();
+            }
         }
     });
 
     return SpawnStrategy;
 })();
+
+module.exports = SpawnStrategy;
+
+var PROGRESSIVE_GOALS = Object.freeze([require("goal-closest-harvest"), require("goal-close-guards")]);

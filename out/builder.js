@@ -14,7 +14,9 @@ var Builder = (function (_Harvester) {
     function Builder() {
         _classCallCheck(this, Builder);
 
-        _get(Object.getPrototypeOf(Builder.prototype), "constructor", this).apply(this, arguments);
+        if (_Harvester != null) {
+            _Harvester.apply(this, arguments);
+        }
     }
 
     _inherits(Builder, _Harvester);
@@ -73,19 +75,5 @@ var Builder = (function (_Harvester) {
 
     return Builder;
 })(Harvester);
-
-Builder.LEVEL_INFO = Object.freeze([{
-    count: 0,
-    parts: [Game.WORK, Game.CARRY, Game.MOVE]
-}, {
-    count: 0,
-    parts: [Game.WORK, Game.CARRY, Game.MOVE]
-}, {
-    count: 1,
-    parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-}, {
-    count: 1,
-    parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-}]);
 
 module.exports = Builder;

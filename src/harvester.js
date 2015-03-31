@@ -3,10 +3,6 @@
 let BaseRole = require('base-role');
 
 class Harvester extends BaseRole {
-    constructor() {
-        super(...arguments);
-    }
-
     static key() {
         return 'harvester';
     }
@@ -26,25 +22,12 @@ class Harvester extends BaseRole {
         if (!this.isViable()) {
             this.creep.suicide();
         } else if (this.creep.energy < this.creep.energyCapacity) {
-            if (!this.spawn.memory.targetSourceId) {
-                var s = this.creep.pos.findClosest(Game.SOURCES, {
-                    filter: function(source) {
-                        return source.energy > 20;
-                    }
-                });
-                if (s) {
-                    this.spawn.memory.targetSourceId = s.id;
-                }
-            }
-
-            if (this.spawn.memory.targetSourceId) {
-                let source = Game.getObjectById(this.spawn.memory.targetSourceId);
-                if (source && source.energy > 10) {
-                    this.creep.moveTo(source);
-                    this.creep.harvest(source);
-                } else {
-                    this.spawn.memory.targetSourceId = null;
-                }
+            let source = Game.getObjectById(this.memory.targetSourceId);
+            if (source && source.energy > 10) {
+                this.creep.moveTo(source);
+                this.creep.harvest(source);
+            } else {
+                console.log('Harvester source invalid!', JSON.stringify(this.memory));
             }
         } else {
             this.creep.moveTo(this.spawn);
@@ -52,24 +35,5 @@ class Harvester extends BaseRole {
         }
     }
 }
-
-Harvester.LEVEL_INFO = Object.freeze([
-    {
-        count: 1,
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        count: 2,
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        count: 2,
-        parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-    },
-    {
-        count: 2,
-        parts: [Game.WORK, Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-    }
-]);
 
 module.exports = Harvester;

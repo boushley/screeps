@@ -13,9 +13,13 @@ var BaseRole = require("base-role"),
 
 var Guard = (function (_BaseRole) {
     function Guard() {
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
         _classCallCheck(this, Guard);
 
-        _get(Object.getPrototypeOf(Guard.prototype), "constructor", this).apply(this, arguments);
+        _get(Object.getPrototypeOf(Guard.prototype), "constructor", this).apply(this, args);
         this.isRangedActive = this.creep.getActiveBodyparts(Game.RANGED_ATTACK) > 0;
         this.isMeleeActive = this.creep.getActiveBodyparts(Game.ATTACK) > 0;
         this.allWeaponsDamaged = !this.isRangedActive && !this.isMeleeActive;
@@ -115,19 +119,5 @@ var Guard = (function (_BaseRole) {
 
     return Guard;
 })(BaseRole);
-
-Guard.LEVEL_INFO = Object.freeze([{
-    count: 1,
-    parts: [Game.RANGED_ATTACK, Game.MOVE]
-}, {
-    count: 1,
-    parts: [Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
-}, {
-    count: 2,
-    parts: [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE]
-}, {
-    count: 3,
-    parts: [Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE]
-}]);
 
 module.exports = Guard;

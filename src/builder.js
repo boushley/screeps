@@ -3,10 +3,6 @@
 var Harvester = require('harvester');
 
 class Builder extends Harvester {
-    constructor() {
-        super(...arguments);
-    }
-
     static key() {
         return 'builder';
     }
@@ -48,24 +44,5 @@ class Builder extends Harvester {
         }
     }
 }
-
-Builder.LEVEL_INFO = Object.freeze([
-    {
-        count: 0,
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        count: 0,
-        parts: [Game.WORK, Game.CARRY, Game.MOVE]
-    },
-    {
-        count: 1,
-        parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-    },
-    {
-        count: 1,
-        parts: [Game.WORK, Game.CARRY, Game.CARRY, Game.MOVE, Game.MOVE]
-    }
-]);
 
 module.exports = Builder;
