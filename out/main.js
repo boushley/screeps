@@ -1,7 +1,10 @@
 "use strict";
 
 var factory = require("factory"),
-    command = require("command");
+    command = require("command"),
+    SpawnStrategy = require("spawn-strategy");
 
-factory.run(Game.spawns.Spawn1);
+var strategy = new SpawnStrategy(Game.spawns.Spawn1);
+
+factory.run(strategy);
 command.run();

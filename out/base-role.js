@@ -50,9 +50,14 @@ var BaseRole = (function () {
                 return this.LEVEL_INFO[level || 0].count;
             }
         },
-        getParts: {
-            value: function getParts(level) {
-                return this.LEVEL_INFO[level || 0].parts;
+        getCreep: {
+            value: function getCreep(level) {
+                return {
+                    parts: this.LEVEL_INFO[level],
+                    memory: {
+                        role: this.key()
+                    }
+                };
             }
         }
     });

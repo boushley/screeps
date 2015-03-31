@@ -16,21 +16,14 @@ const ORDERED_TYPES = Object.freeze([
     Guard
 ]);
 
-let buildCreep = exports.buildCreep = function(spawn, type, parts) {
-    let id = Math.random().toString(32).substr(2, 8);
+let buildCreep = exports.buildCreep = function(strategy, type, level) {
+    let id = Math.random().toString(32).substr(2, 8),
+        buildInfo = type.getCreep(level, strategy);
 
-    let result = Game.spawns.Spawn1.createCreep(
-        parts,
-        type + '-' + id,
-        {
-            id: id,
-            role: type,
-            spawnName: spawn.name
-        }
-    );
+    let result = strategy.createCreep(buildInfo.parts, type + '-' + id, buildInfo.memory);
 
     if (result === Game.OK) {
-        console.log('Created', type + '-' + id, 'Cost:', calculateCost(parts));
+        console.log('Created', type + '-' + id, 'Cost:', calculateCost(buildInfo.parts));
     }
 };
 
@@ -41,8 +34,8 @@ function calculateCost(parts) {
     parts.forEach(p => cost += c.PART_COST[p]);
 }
 
-function loopTypes(spawn, threshold, level) {
-    if (spawn.energy < threshold || spawn.spawning) {
+function loopTypes(strategy, threshold, level) {
+    if (strategy.isSpawnReady(threshold)) {
         return;
     }
 
@@ -55,19 +48,19 @@ function loopTypes(spawn, threshold, level) {
             counts[typeKey] = 0;
         }
         if (counts[typeKey] < c) {
-            buildCreep(spawn, typeKey, type.getParts(level));
+            buildCreep(strategy, type, level);
             return;
         }
     }
 }
 
-exports.run = function(spawn) {
-    if (!spawn || spawn.spawning) {
+exports.run = function(strategy) {
+    if (!strategy.isSpawnReady()) {
         return;
     }
 
-    loopTypes(spawn, 800, 3);
-    loopTypes(spawn, 600, 2);
-    loopTypes(spawn, 400, 1);
-    loopTypes(spawn, 0, 0);
+    loopTypes(strategy, 800, 3);
+    loopTypes(strategy, 600, 2);
+    loopTypes(strategy, 400, 1);
+    loopTypes(strategy, 0, 0);
 };

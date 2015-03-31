@@ -10,8 +10,13 @@ class BaseRole {
         return this.LEVEL_INFO[level || 0].count;
     }
 
-    static getParts(level) {
-        return this.LEVEL_INFO[level || 0].parts;
+    static getCreep(level) {
+        return {
+            parts: this.LEVEL_INFO[level],
+            memory: {
+                role: this.key()
+            }
+        };
     }
 
     getRally() {

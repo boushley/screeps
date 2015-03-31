@@ -28,6 +28,10 @@ var Healer = (function (_BaseRole) {
                     }
                 });
 
+                // TODO Take advantage of the fact that we can heal AND
+                // ranged heal AND move in the same turn.
+                // Also have better standby logic, maybe something to
+                // stay away from enemies.
                 if (target) {
                     if (this.creep.pos.isNearTo(target)) {
                         this.creep.heal(target);
