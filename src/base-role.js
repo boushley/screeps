@@ -6,6 +6,7 @@ class BaseRole {
     constructor(creep) {
         this.creep = creep;
         this.spawn = Game.spawns[creep.memory.spawnName];
+        this.memory = creep.memory;
     }
 
     static wantsToBuild(level) {
