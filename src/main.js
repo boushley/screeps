@@ -1,3 +1,5 @@
+'use strict';
+
 let factory = require('factory'),
     command = require('command'),
     SpawnStrategy = require('spawn-strategy'),
