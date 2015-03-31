@@ -5,8 +5,6 @@ let GoalBase = require('goal-base'),
     Guard = require('guard'),
     Healer = require('healer');
 
-const ADVANCED_UNIT_THRESHOLD = 1000;
-
 class GoalCloseGuards extends GoalBase {
     static key() {
         return 'goal-close-guards';
@@ -20,12 +18,14 @@ class GoalCloseGuards extends GoalBase {
         let healerCount = counts[Healer.key()] || 0,
             parts;
 
-        if (this.spawn.energy > ADVANCED_UNIT_THRESHOLD) {
-            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
-        } else if (healerCount < 1) {
+        if (healerCount < 1) {
             parts = [Game.MOVE, Game.HEAL];
-        } else {
+        } else if (healerCount < 3) {
             parts = [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
+        } else if (healerCount < 6) {
+            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
+        } else {
+            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
         }
 
         return parts;
@@ -35,12 +35,14 @@ class GoalCloseGuards extends GoalBase {
         let guardCount = counts[Guard.key()] || 0,
             parts;
 
-        if (this.spawn.energy > ADVANCED_UNIT_THRESHOLD) {
-            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE];
-        } else if (guardCount < 1) {
+        if (guardCount < 1) {
             parts = [Game.RANGED_ATTACK, Game.MOVE];
-        } else {
+        } else if (guardCount < 3) {
             parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE];
+        } else if (guardCount < 6) {
+            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE];
+        } else {
+            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.MOVE];
         }
 
         return parts;
