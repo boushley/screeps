@@ -25,7 +25,7 @@ class GoalCloseGuards extends GoalBase {
         } else if (healerCount < 6) {
             parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
         } else {
-            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
+            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.HEAL, Game.MOVE, Game.HEAL];
         }
 
         return parts;
@@ -42,7 +42,7 @@ class GoalCloseGuards extends GoalBase {
         } else if (guardCount < 6) {
             parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE];
         } else {
-            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.MOVE];
+            parts =  [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.MOVE];
         }
 
         return parts;
