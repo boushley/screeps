@@ -79,7 +79,7 @@
                     }
                 };
             } else if (harvesters.length < 2) {
-                var l = {
+                let l = {
                     x: this.memory.guardLocation.x,
                     y: this.memory.guardLocation.y + 3
                 };

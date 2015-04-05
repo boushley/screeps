@@ -71,6 +71,7 @@
     const PROGRESSIVE_GOALS = Object.freeze([
         require('goal-closest-harvest'),
         require('goal-close-guards'),
-        require('goal-mine-kept-source')
+        require('goal-mine-kept-source'),
+        require('goal-lots-of-guards')
     ]);
 })();
