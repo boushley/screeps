@@ -1,74 +1,61 @@
-'use strict';
+(function() {
+    'use strict';
 
-let GoalBase = require('goal-base'),
-    counts = require('counts'),
-    Guard = require('guard'),
-    Healer = require('healer');
+    let GoalBase = require('goal-base'),
+        Guard = require('guard'),
+        Healer = require('healer'),
+        creepBreakdown = require('creep-breakdown');
 
-class GoalCloseGuards extends GoalBase {
-    static key() {
-        return 'goal-close-guards';
-    }
+    let breakdown, guards, healers;
 
-    static isComplete() {
-        return false;
-    }
-
-    getHealerToBuild() {
-        let healerCount = counts[Healer.key()] || 0,
-            parts;
-
-        if (healerCount < 1) {
-            parts = [Game.MOVE, Game.HEAL];
-        } else if (healerCount < 3) {
-            parts = [Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
-        } else if (healerCount < 6) {
-            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.MOVE, Game.HEAL];
-        } else {
-            parts = [Game.TOUGH, Game.MOVE, Game.HEAL, Game.HEAL, Game.MOVE, Game.HEAL];
+    class GoalCloseGuards extends GoalBase {
+        static key() {
+            return 'goal-close-guards';
         }
 
-        return parts;
-    }
+        static isComplete() {
+            let guardCount = guards.length,
+                healerCount = healers.length;
 
-    getGuardToBuild() {
-        let guardCount = counts[Guard.key()] || 0,
-            parts;
-
-        if (guardCount < 1) {
-            parts = [Game.RANGED_ATTACK, Game.MOVE];
-        } else if (guardCount < 3) {
-            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE];
-        } else if (guardCount < 6) {
-            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.MOVE];
-        } else {
-            parts = [Game.TOUGH, Game.TOUGH, Game.RANGED_ATTACK, Game.MOVE, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.MOVE];
+            return guardCount >= 2
+                && healerCount >= 1;
         }
 
-        return parts;
-    }
-
-    getCreepToBuild() {
-        let parts,
-            role,
-            guardCount = counts[Guard.key()] || 0,
-            healerCount = counts[Healer.key()] || 0;
-
-        if (healerCount < guardCount) {
-            role = Healer.key();
-            parts = this.getHealerToBuild();
-        } else {
-            role = Guard.key();
-            parts = this.getGuardToBuild();
+        getHealerToBuild() {
+            return [Game.TOUGH, Game.MOVE, Game.HEAL];
         }
 
-        return {
-            parts,
-            memory: {
-                role
+        getGuardToBuild() {
+            return [Game.TOUGH, Game.RANGED_ATTACK, Game.RANGED_ATTACK, Game.MOVE];
+        }
+
+        getCreepToBuild() {
+            let parts,
+                role,
+                guardCount = guards.length,
+                healerCount = healers.length;
+
+            if (healerCount < guardCount) {
+                role = Healer.key();
+                parts = this.getHealerToBuild();
+            } else {
+                role = Guard.key();
+                parts = this.getGuardToBuild();
             }
-        };
-    }
-}
 
-module.exports = GoalCloseGuards;
+            return {
+                parts,
+                memory: {
+                    role,
+                    goal: GoalCloseGuards.key()
+                }
+            };
+        }
+    }
+
+    module.exports = GoalCloseGuards;
+
+    breakdown = creepBreakdown.getGoal(GoalCloseGuards.key());
+    guards = breakdown.getRole(Guard.key());
+    healers = breakdown.getRole(Healer.key());
+})();

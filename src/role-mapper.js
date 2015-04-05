@@ -5,6 +5,8 @@ let Harvester = require('harvester'),
     Builder = require('builder'),
     Healer = require('healer'),
     Runner = require('role-runner'),
+    FixedGuard = require('role-fixed-guard'),
+    FixedHealer = require('role-fixed-healer'),
     Guard = require('guard');
 
 class RoleMapper {
@@ -23,6 +25,8 @@ class RoleMapper {
 
 let roleMap = new RoleMapper();
 
+roleMap.registerType(FixedHealer.key(), FixedHealer);
+roleMap.registerType(FixedGuard.key(), FixedGuard);
 roleMap.registerType(Harvester.key(), Harvester);
 roleMap.registerType(Attacker.key(), Attacker);
 roleMap.registerType(Builder.key(), Builder);

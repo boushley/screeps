@@ -1,10 +1,11 @@
 'use strict';
-
-class GoalBase {
-    constructor(memory, spawn) {
-        this.memory = memory;
-        this.spawn = spawn;
+(function() {
+    class GoalBase {
+        constructor(memory, spawn) {
+            this.memory = memory;
+            this.spawn = spawn;
+        }
     }
-}
 
-module.exports = GoalBase;
+    module.exports = GoalBase;
+})();

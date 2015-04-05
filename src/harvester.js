@@ -19,10 +19,15 @@ class Harvester extends BaseRole {
     }
 
     run() {
+        let source = Game.getObjectById(this.memory.targetSourceId),
+            enemies = source.pos.findInRange(Game.HOSTILE_CREEPS, 4);
+
         if (!this.isViable()) {
             this.creep.suicide();
+        } else if (this.memory.fallbackLocation && enemies.length > 0) {
+            let l = this.memory.fallbackLocation;
+            this.creep.moveTo(l.x, l.y);
         } else if (this.creep.energy < this.creep.energyCapacity) {
-            let source = Game.getObjectById(this.memory.targetSourceId);
             if (source && source.energy > 10) {
                 this.creep.moveTo(source);
                 this.creep.harvest(source);

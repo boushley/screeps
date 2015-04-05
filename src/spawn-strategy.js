@@ -1,60 +1,76 @@
-'use strict';
+(function() {
+    'use strict';
 
-class SpawnStrategy {
-    constructor(spawn) {
-        this.spawn = spawn;
+    class SpawnStrategy {
+        constructor(spawn) {
+            this.spawn = spawn;
 
-        if (!Memory.strategy) {
-            Memory.strategy = {};
-        }
-        this.memory = Memory.strategy;
+            if (!Memory.strategy) {
+                Memory.strategy = {};
+            }
+            this.memory = Memory.strategy;
 
-        if (!this.memory.goalMemories) {
-            this.memory.goalMemories = {};
-        }
+            if (!this.memory.goalMemories) {
+                this.memory.goalMemories = {};
+            }
 
-        for (let GoalClass of PROGRESSIVE_GOALS) {
-            if (!GoalClass.isComplete()) {
-                let goalKey = GoalClass.key();
-                if (!this.memory.goalMemories[goalKey]) {
-                    this.memory.goalMemories[goalKey] = {};
+            if (!Game.flags.BoushleyRally && spawn) {
+                spawn.room.createFlag(
+                    spawn.pos.x + 3,
+                    spawn.pos.y - 3,
+                    'BoushleyRally',
+                    Game.COLOR_GREEN
+                );
+            }
+
+            for (let GoalClass of PROGRESSIVE_GOALS) {
+                if (GoalClass.process) {
+                    GoalClass.process();
                 }
-                this.goal = new GoalClass(this.memory.goalMemories[goalKey], this.spawn);
-                break;
+
+                if (!this.goal && !GoalClass.isComplete()) {
+                    let goalKey = GoalClass.key();
+                    if (!this.memory.goalMemories[goalKey]) {
+                        this.memory.goalMemories[goalKey] = {};
+                    }
+                    this.goal = new GoalClass(this.memory.goalMemories[goalKey], this.spawn);
+                    break;
+                }
             }
         }
-    }
 
-    isSpawnReady(thresholdEnergy) {
-        if (!this.spawn) {
-            return false;
+        isSpawnReady(thresholdEnergy) {
+            if (!this.spawn) {
+                return false;
+            }
+            if (this.spawn.spawning) {
+                return false;
+            }
+
+            thresholdEnergy = thresholdEnergy || 0;
+            if (thresholdEnergy > this.spawn.energy) {
+                return false;
+            }
+
+            return true;
         }
-        if (this.spawn.spawning) {
-            return false;
+
+        createCreep(parts, name, memory) {
+            memory.spawnName = memory.spawnName || this.spawn.name;
+
+            return this.spawn.createCreep(parts, name, memory);
         }
 
-        thresholdEnergy = thresholdEnergy || 0;
-        if (thresholdEnergy > this.spawn.energy) {
-            return false;
+        getCreepToBuild() {
+            return this.goal.getCreepToBuild();
         }
-
-        return true;
     }
 
-    createCreep(parts, name, memory) {
-        memory.spawnName = memory.spawnName || this.spawn.name;
+    module.exports = SpawnStrategy;
 
-        return this.spawn.createCreep(parts, name, memory);
-    }
-
-    getCreepToBuild() {
-        return this.goal.getCreepToBuild();
-    }
-}
-
-module.exports = SpawnStrategy;
-
-const PROGRESSIVE_GOALS = Object.freeze([
-    require('goal-closest-harvest'),
-    require('goal-close-guards')
-]);
+    const PROGRESSIVE_GOALS = Object.freeze([
+        require('goal-closest-harvest'),
+        require('goal-close-guards'),
+        require('goal-mine-kept-source')
+    ]);
+})();

@@ -1,77 +1,72 @@
 'use strict';
+(function() {
+    let GoalBase = require('goal-base'),
+        Harvester = require('harvester'),
+        Runner = require('role-runner'),
+        _ = require('lodash'),
+        creepBreakdown = require('creep-breakdown');
 
-let GoalBase = require('goal-base'),
-    Harvester = require('harvester'),
-    Runner = require('role-runner'),
-    _ = require('lodash');
+    let breakdown, harvesters, runners, harvesterIds;
 
-class GoalClosestHarvest extends GoalBase {
-    static key() {
-        return 'goal-closest-harvest';
-    }
+    class GoalClosestHarvest extends GoalBase {
+        static key() {
+            return 'goal-closest-harvest';
+        }
 
-    static isComplete() {
-        let harvesters = _.filter(Game.creeps, c => {
-                let isHarvester = c.memory.role === Harvester.key(),
-                    thisGoal = c.memory.goal === GoalClosestHarvest.key();
-                return c.my && isHarvester && thisGoal;
-            }),
-            runners = _.filter(Game.creeps, c => {
-                let isRunner = c.memory.role === Runner.key(),
-                    thisGoal = c.memory.goal === GoalClosestHarvest.key();
-                return c.my && isRunner && thisGoal;
-            }),
-            enoughHarvesters = harvesters.length >= 2,
-            enoughRunners = runners.length >= 2;
-        return enoughHarvesters && enoughRunners;
-    }
+        static isComplete() {
+            let harvestersCount = harvesters.length,
+                runnersCount = runners.length,
+                enoughHarvesters = harvestersCount >= 2,
+                enoughRunners = runnersCount >= 2;
 
-    constructor(...args) {
-        super(...args);
+            return enoughHarvesters && enoughRunners;
+        }
 
-        if (!this.memory.targetSourceId) {
-            var source = this.spawn.pos.findClosest(Game.SOURCES, {
-                filter: s => s.energy > 20
+        static process() {
+            runners.forEach(r => {
+                r.harvestersToCollect = harvesterIds;
             });
-            this.memory.targetSourceId = source.id;
+        }
+
+        constructor(...args) {
+            super(...args);
+
+            if (!this.memory.targetSourceId) {
+                var source = this.spawn.pos.findClosest(Game.SOURCES);
+                this.memory.targetSourceId = source.id;
+            }
+        }
+
+        getCreepToBuild() {
+            if (harvesters.length < 2) {
+                return {
+                    parts: [Game.MOVE, Game.WORK, Game.WORK, Game.WORK, Game.CARRY],
+                    memory: {
+                        role: Harvester.key(),
+                        targetSourceId: this.memory.targetSourceId,
+                        goal: GoalClosestHarvest.key()
+                    }
+                };
+            } else if (runners.length < 2) {
+                let harvesterIds = _.map(harvesters, h => h.id);
+                return {
+                    parts: [Game.MOVE, Game.CARRY],
+                    memory: {
+                        role: Runner.key(),
+                        harvestersToCollect: harvesterIds,
+                        goal: GoalClosestHarvest.key()
+                    }
+                };
+            } else {
+                console.error('What to build?! Goal Closest Harvest');
+            }
         }
     }
 
-    getCreepToBuild() {
-        let harvesters = _.filter(Game.creeps, c => {
-                let isHarvester = c.memory.role === Harvester.key(),
-                    thisGoal = c.memory.goal === GoalClosestHarvest.key();
-                return c.my && isHarvester && thisGoal;
-            }),
-            runners = _.filter(Game.creeps, c => {
-                let isRunner = c.memory.role === Runner.key(),
-                    thisGoal = c.memory.goal === GoalClosestHarvest.key();
-                return c.my && isRunner && thisGoal;
-            });
+    module.exports = GoalClosestHarvest;
 
-        if (harvesters.length < 2) {
-            return {
-                parts: [Game.MOVE, Game.WORK, Game.WORK, Game.WORK, Game.CARRY],
-                memory: {
-                    role: Harvester.key(),
-                    targetSourceId: this.memory.targetSourceId,
-                    goal: GoalClosestHarvest.key()
-                }
-            };
-        } else if (runners.length < 2) {
-            let harvesterIds = _.map(harvesters, h => h.id);
-            return {
-                parts: [Game.MOVE, Game.CARRY],
-                memory: {
-                    role: Runner.key(),
-                    harvestersToCollect: harvesterIds,
-                    goal: GoalClosestHarvest.key()
-                }
-            };
-        } else {
-            console.error('What to build?! Goal Closest Harvest');
-        }
-    }
-}
-
-module.exports = GoalClosestHarvest;
+    breakdown = creepBreakdown.getGoal(GoalClosestHarvest.key());
+    harvesters = breakdown.getRole(Harvester.key());
+    runners = breakdown.getRole(Runner.key());
+    harvesterIds = _.map(harvesters, h => h.id);
+})();
