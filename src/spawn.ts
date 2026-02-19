@@ -91,6 +91,6 @@ export function run(spawn: StructureSpawn): void {
   if (result === OK) {
     console.log(`Spawning ${name} [${body.join(",")}]`);
   } else {
-    console.warn(`Failed spawning. Status: ${result} -- ${name} [${body.join(",")}]`);
+    console.log(`Failed spawning. Status: ${result} -- ${name} [${body.join(",")}]`);
   }
 }

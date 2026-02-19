@@ -25,7 +25,11 @@ Always use the efficient memory system from `src/memory.ts` instead of the defau
 
 ## CPU Limits
 
-Screeps enforces strict CPU limits per tick. Any long-running work (e.g., scanning rooms, path caching, market analysis) must be designed to respect CPU budgets and be **resumable across ticks**. Break large tasks into incremental chunks that can pick up where they left off if CPU runs low.
+Screeps enforces strict CPU limits per tick. The CPU budget helpers live in `src/cpu.ts`:
+
+- **`hasCpu(expectedCost?)`** — check if there's enough CPU remaining before doing work. Pass `expectedCost` for expensive operations (e.g., `hasCpu(5)` before a pathfinding call); omit it for cheap checks.
+
+Any long-running work (e.g., scanning rooms, path caching, market analysis) must be designed to respect CPU budgets and be **resumable across ticks**. Break large tasks into incremental chunks that can pick up where they left off if CPU runs low.
 
 ## Build System
 

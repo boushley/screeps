@@ -6,6 +6,6 @@ export function init(): void {
   budget = Game.cpu.tickLimit - SAVE_RESERVE;
 }
 
-export function hasCpu(): boolean {
-  return Game.cpu.getUsed() < budget;
+export function hasCpu(expectedCost: number = 0): boolean {
+  return Game.cpu.getUsed() + expectedCost < budget;
 }
