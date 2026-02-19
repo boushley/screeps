@@ -1,0 +1,3 @@
+[submodule "docs/screeps"]
+	path = docs/screeps
+	url = git@github.com:screeps/docs.git
