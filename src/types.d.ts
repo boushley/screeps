@@ -7,14 +7,30 @@ declare var global: {
   _parsedMemory?: Memory;
 };
 
+interface CreepReservation {
+  room: string;
+  type: string;
+  targetId: string;
+}
+
 interface CreepMemory {
   role: string;
   task?: string;
   target?: Id<any>;
+  reservations?: CreepReservation[];
 }
 
 interface GameMemory {
   creepRunIndex?: number;
+  lastReservationScan?: number;
+}
+
+interface RoomMemory {
+  reservations?: {
+    [type: string]: {
+      [targetId: string]: string[];
+    };
+  };
 }
 
 interface Memory {

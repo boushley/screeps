@@ -1,5 +1,6 @@
 import { init as initMemory, save as saveMemory } from "./memory";
 import { init as initCpuBudget, hasCpu } from "./cpu";
+import { tickComplete as flushNotifications } from "./notify";
 import { run as runSpawn } from "./spawn";
 import { roles } from "./roles";
 
@@ -52,5 +53,6 @@ export function loop(): void {
 
   runCreeps(mem);
 
+  flushNotifications();
   saveMemory();
 }

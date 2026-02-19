@@ -1,3 +1,4 @@
+import { reserve, slotCount } from "../reservations";
 import { RoleDefinition } from "./types";
 
 const WORK_COST = 100;
@@ -62,13 +63,38 @@ export const harvester: RoleDefinition = {
       return;
     }
 
-    // Harvest from assigned or closest source
-    const source = creep.memory.target
-      ? Game.getObjectById(creep.memory.target as Id<Source>)
-      : creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    // Harvest from assigned or closest available source
+    let source: Source | null = null;
+
+    // Try to reuse existing assignment
+    if (creep.memory.target) {
+      source = Game.getObjectById(creep.memory.target as Id<Source>);
+      if (source) {
+        reserve(creep.room, "source", source.id, creep.name, 1);
+      }
+    }
+
+    // Find a new source via reservations
+    if (!source) {
+      const sources = creep.room.find(FIND_SOURCES);
+      const maxSlots = 1;
+
+      // Filter to unreserved sources
+      const unreserved = sources.filter((s) =>
+        slotCount(creep.room, "source", s.id) < maxSlots,
+      );
+
+      // Pick closest unreserved, or fallback to any source
+      const candidates = unreserved.length > 0 ? unreserved : sources;
+      source = creep.pos.findClosestByRange(candidates);
+
+      if (source) {
+        creep.memory.target = source.id;
+        reserve(creep.room, "source", source.id, creep.name, maxSlots);
+      }
+    }
 
     if (source) {
-      creep.memory.target = source.id;
       if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
         creep.moveTo(source);
       }
