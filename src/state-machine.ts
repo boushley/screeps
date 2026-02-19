@@ -6,13 +6,13 @@ export function runStateMachine(
   states: StateMap,
   defaultState: string,
 ): void {
-  const state = creep.memory.task ?? defaultState;
+  const state = creep.mem.task ?? defaultState;
   const handler = states[state];
   if (handler) {
     handler(creep);
   } else {
     // Unknown state — reset to default
-    creep.memory.task = defaultState;
+    creep.mem.task = defaultState;
     states[defaultState]?.(creep);
   }
 }

@@ -101,13 +101,14 @@ export function save(): void {
   }
 }
 
-// Prototype hijacking — runs once per isolate at module load time
+// Prototype hijacking — define `.mem` on prototypes to bypass the engine's
+// non-configurable `.memory` property while using our optimized RawMemory parsing.
 
 function hijackMemory<T extends { name: string }>(
   proto: T,
   segment: keyof Memory,
 ): void {
-  Object.defineProperty(proto, "memory", {
+  Object.defineProperty(proto, "mem", {
     get(this: T): Record<string, unknown> {
       const mem = global._parsedMemory;
       if (!mem) return {};

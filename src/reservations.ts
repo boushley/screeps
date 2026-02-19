@@ -1,5 +1,5 @@
 function ensureTable(room: Room, type: string): { [targetId: string]: string[] } {
-  const mem = room.memory as RoomMemory;
+  const mem = room.mem as RoomMemory;
   if (!mem.reservations) mem.reservations = {};
   if (!mem.reservations[type]) mem.reservations[type] = {};
   return mem.reservations[type];
@@ -8,24 +8,24 @@ function ensureTable(room: Room, type: string): { [targetId: string]: string[] }
 function addCreepReservation(creepName: string, room: Room, type: string, targetId: string): void {
   const creep = Game.creeps[creepName];
   if (!creep) return;
-  if (!creep.memory.reservations) creep.memory.reservations = [];
-  const existing = creep.memory.reservations.some(
+  if (!creep.mem.reservations) creep.mem.reservations = [];
+  const existing = creep.mem.reservations.some(
     (r) => r.room === room.name && r.type === type && r.targetId === targetId,
   );
   if (!existing) {
-    creep.memory.reservations.push({ room: room.name, type, targetId });
+    creep.mem.reservations.push({ room: room.name, type, targetId });
   }
 }
 
 function removeCreepReservation(creepName: string, roomName: string, type: string, targetId: string): void {
   const creep = Game.creeps[creepName];
   if (!creep) return;
-  const list = creep.memory.reservations;
+  const list = creep.mem.reservations;
   if (!list) return;
-  creep.memory.reservations = list.filter(
+  creep.mem.reservations = list.filter(
     (r) => !(r.room === roomName && r.type === type && r.targetId === targetId),
   );
-  if (creep.memory.reservations.length === 0) delete creep.memory.reservations;
+  if (creep.mem.reservations.length === 0) delete creep.mem.reservations;
 }
 
 export function reserve(
@@ -53,7 +53,7 @@ export function release(
   targetId: string,
   creepName: string,
 ): void {
-  const mem = room.memory as RoomMemory;
+  const mem = room.mem as RoomMemory;
   const table = mem.reservations?.[type];
   if (!table?.[targetId]) return;
 
@@ -63,7 +63,7 @@ export function release(
 }
 
 export function releaseAll(room: Room, creepName: string): void {
-  const mem = room.memory as RoomMemory;
+  const mem = room.mem as RoomMemory;
   if (!mem.reservations) return;
 
   for (const type in mem.reservations) {
@@ -77,11 +77,11 @@ export function releaseAll(room: Room, creepName: string): void {
 
   // Clear creep-side reservations for this room
   const creep = Game.creeps[creepName];
-  if (creep?.memory.reservations) {
-    creep.memory.reservations = creep.memory.reservations.filter(
+  if (creep?.mem.reservations) {
+    creep.mem.reservations = creep.mem.reservations.filter(
       (r) => r.room !== room.name,
     );
-    if (creep.memory.reservations.length === 0) delete creep.memory.reservations;
+    if (creep.mem.reservations.length === 0) delete creep.mem.reservations;
   }
 }
 
@@ -90,7 +90,7 @@ export function getAvailable(
   type: string,
   maxSlots: number,
 ): string[] {
-  const mem = room.memory as RoomMemory;
+  const mem = room.mem as RoomMemory;
   const table = mem.reservations?.[type] || {};
 
   const entries: Array<{ id: string; count: number }> = [];
@@ -110,6 +110,6 @@ export function slotCount(
   type: string,
   targetId: string,
 ): number {
-  const mem = room.memory as RoomMemory;
+  const mem = room.mem as RoomMemory;
   return mem.reservations?.[type]?.[targetId]?.length ?? 0;
 }

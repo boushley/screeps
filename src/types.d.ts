@@ -41,3 +41,21 @@ interface Memory {
   powerCreeps: Record<string, PowerCreepMemory>;
   game: GameMemory;
 }
+
+// Declaration merging: add `.mem` property that uses our optimized RawMemory parsing.
+// Do NOT use the built-in `.memory` — it triggers the engine's default parser.
+interface Creep {
+  mem: CreepMemory;
+}
+interface Room {
+  mem: RoomMemory;
+}
+interface StructureSpawn {
+  mem: SpawnMemory;
+}
+interface Flag {
+  mem: FlagMemory;
+}
+interface PowerCreep {
+  mem: PowerCreepMemory;
+}

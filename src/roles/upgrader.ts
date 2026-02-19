@@ -9,13 +9,13 @@ const STATE_COLLECTING = 'collecting' as const;
 const STATE_UPGRADING = 'upgrading' as const;
 
 function transitions(creep: Creep): void {
-  const upgrading = creep.memory.task === STATE_UPGRADING;
+  const upgrading = creep.mem.task === STATE_UPGRADING;
 
   if (upgrading && creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-    creep.memory.task = STATE_COLLECTING;
+    creep.mem.task = STATE_COLLECTING;
   }
   if (!upgrading && creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-    creep.memory.task = STATE_UPGRADING;
+    creep.mem.task = STATE_UPGRADING;
   }
 }
 

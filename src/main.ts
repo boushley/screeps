@@ -22,7 +22,7 @@ function runCreeps(mem: Memory): void {
 
     const creep = Game.creeps[names[index]];
     if (creep && !creep.spawning) {
-      const role = roles[creep.memory.role];
+      const role = roles[creep.mem.role];
       if (role) {
         role.run(creep);
       }

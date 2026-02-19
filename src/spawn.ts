@@ -9,7 +9,7 @@ interface SpawnRequest {
 function countRole(role: string): number {
   let count = 0;
   for (const name in Game.creeps) {
-    if (Game.creeps[name].memory.role === role) {
+    if (Game.creeps[name].mem.role === role) {
       count++;
     }
   }

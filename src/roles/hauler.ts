@@ -8,18 +8,18 @@ const STATE_COLLECTING = 'collecting' as const;
 const STATE_DELIVERING = 'delivering' as const;
 
 function transitions(creep: Creep): void {
-  const collecting = creep.memory.task !== STATE_DELIVERING;
+  const collecting = creep.mem.task !== STATE_DELIVERING;
 
   if (collecting && creep.store.getFreeCapacity() === 0) {
-    creep.memory.task = STATE_DELIVERING;
+    creep.mem.task = STATE_DELIVERING;
   }
   if (!collecting && creep.store.getUsedCapacity() === 0) {
-    creep.memory.task = STATE_COLLECTING;
+    creep.mem.task = STATE_COLLECTING;
   }
 
   // If no task set but carrying energy, start delivering
-  if (!creep.memory.task && creep.store.getUsedCapacity() > 0) {
-    creep.memory.task = STATE_DELIVERING;
+  if (!creep.mem.task && creep.store.getUsedCapacity() > 0) {
+    creep.mem.task = STATE_DELIVERING;
   }
 }
 

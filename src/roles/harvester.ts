@@ -67,8 +67,8 @@ export const harvester: RoleDefinition = {
     let source: Source | null = null;
 
     // Try to reuse existing assignment
-    if (creep.memory.target) {
-      source = Game.getObjectById(creep.memory.target as Id<Source>);
+    if (creep.mem.target) {
+      source = Game.getObjectById(creep.mem.target as Id<Source>);
       if (source) {
         reserve(creep.room, "source", source.id, creep.name, 1);
       }
@@ -89,7 +89,7 @@ export const harvester: RoleDefinition = {
       source = creep.pos.findClosestByRange(candidates);
 
       if (source) {
-        creep.memory.target = source.id;
+        creep.mem.target = source.id;
         reserve(creep.room, "source", source.id, creep.name, maxSlots);
       }
     }
