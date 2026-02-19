@@ -4,9 +4,10 @@ const defaultMemory: Memory = {
   spawns: {},
   flags: {},
   powerCreeps: {},
+  game: {},
 };
 
-export function init(): void {
+export function init(): Memory {
   if (!global._parsedMemory) {
     const raw = RawMemory.get();
     if (raw.length > 0) {
@@ -23,6 +24,7 @@ export function init(): void {
   if (!mem.spawns) mem.spawns = {};
   if (!mem.flags) mem.flags = {};
   if (!mem.powerCreeps) mem.powerCreeps = {};
+  if (!mem.game) mem.game = {};
 
   // Clean up dead creep memory
   for (const name in mem.creeps) {
@@ -30,6 +32,8 @@ export function init(): void {
       delete mem.creeps[name];
     }
   }
+
+  return mem;
 }
 
 export function save(): void {

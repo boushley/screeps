@@ -16,7 +16,12 @@ These summaries are designed to give you enough context to write game scripts. W
 
 ## Memory
 
-Always use the efficient memory system from `src/memory.ts` instead of the default `Memory` global. Our memory module parses `RawMemory` once per tick and hijacks prototypes so that `creep.memory`, `room.memory`, etc. work automatically. Never access `Memory` directly — it bypasses our optimized parsing/serialization.
+Always use the efficient memory system from `src/memory.ts` instead of the default `Memory` global. Our memory module parses `RawMemory` once per tick and hijacks prototypes to work automatically. Never access `Memory` directly — it bypasses our optimized parsing/serialization.
+
+- **`init()` returns a `Memory` reference** — capture it (`const mem = initMemory()`) and pass it to functions that need global state, instead of accessing `global._parsedMemory` directly.
+- **Memory sections:** `creeps`, `rooms`, `spawns`, `flags`, `powerCreeps`, `game`
+- **`game` section** (`GameMemory`): stores global game state like `creepRunIndex`. Use this for any cross-tick bookkeeping rather than ad-hoc top-level keys.
+- **Prototype hijacks** (safe to use): `creep.memory`, `room.memory`, `spawn.memory`, `flag.memory`, `powerCreep.memory`
 
 ## CPU Limits
 

@@ -3,12 +3,11 @@ import { init as initCpuBudget, hasCpu } from "./cpu";
 import { run as runSpawn } from "./spawn";
 import { roles } from "./roles";
 
-function runCreeps(): void {
+function runCreeps(mem: Memory): void {
   const names = Object.keys(Game.creeps);
   if (names.length === 0) return;
 
-  const mem = global._parsedMemory!;
-  let index = mem._creepRunIndex ?? 0;
+  let index = mem.game.creepRunIndex ?? 0;
   if (index >= names.length) index = 0;
 
   const startIndex = index;
@@ -16,7 +15,7 @@ function runCreeps(): void {
 
   while (ran < names.length) {
     if (!hasCpu()) {
-      mem._creepRunIndex = index;
+      mem.game.creepRunIndex = index;
       return;
     }
 
@@ -33,11 +32,11 @@ function runCreeps(): void {
   }
 
   // Finished all creeps, reset index
-  mem._creepRunIndex = 0;
+  mem.game.creepRunIndex = 0;
 }
 
 export function loop(): void {
-  initMemory();
+  const mem = initMemory();
   initCpuBudget();
 
   const spawns = Object.values(Game.spawns);
@@ -51,7 +50,7 @@ export function loop(): void {
     runSpawn(spawn);
   }
 
-  runCreeps();
+  runCreeps(mem);
 
   saveMemory();
 }

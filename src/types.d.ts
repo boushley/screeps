@@ -13,11 +13,15 @@ interface CreepMemory {
   target?: Id<any>;
 }
 
+interface GameMemory {
+  creepRunIndex?: number;
+}
+
 interface Memory {
   creeps: Record<string, CreepMemory>;
   rooms: Record<string, RoomMemory>;
   spawns: Record<string, SpawnMemory>;
   flags: Record<string, FlagMemory>;
   powerCreeps: Record<string, PowerCreepMemory>;
-  _creepRunIndex?: number;
+  game: GameMemory;
 }
