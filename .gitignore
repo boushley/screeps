@@ -28,5 +28,6 @@ node_modules
 .lock-wscript
 
 build
+dist
 screeps-creds.json
 tmp

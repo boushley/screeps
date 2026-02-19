@@ -13,3 +13,14 @@ These summaries are designed to give you enough context to write game scripts. W
 
 - **Game guides:** `docs/screeps/source/*.md`
 - **API reference:** `docs/screeps/api/source/*.md`
+
+## Build System
+
+- **Setup:** `npm install`
+- **Build:** `npm run build` — compiles TypeScript and bundles to `dist/main.js`
+- **Watch:** `npm run watch` — rebuilds on file changes
+
+## Project Structure
+
+- `src/` — TypeScript source files (entry point: `src/main.ts`)
+- `dist/` — Build output (single `main.js` for Screeps, gitignored)
