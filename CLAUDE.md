@@ -31,6 +31,10 @@ Screeps enforces strict CPU limits per tick. The CPU budget helpers live in `src
 
 Any long-running work (e.g., scanning rooms, path caching, market analysis) must be designed to respect CPU budgets and be **resumable across ticks**. Break large tasks into incremental chunks that can pick up where they left off if CPU runs low.
 
+## State Machines
+
+Roles and other systems that use state machines follow the patterns in `docs/state-machines.md`. Read that doc before modifying or creating stateful functionality.
+
 ## Build System
 
 - **Setup:** `npm install`
