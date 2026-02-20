@@ -1,4 +1,5 @@
 import { roles } from "./roles";
+import { getSafeSourceCount } from "./room-analysis";
 
 interface SpawnRequest {
   priority: number;
@@ -8,7 +9,7 @@ interface SpawnRequest {
 
 function buildSpawnQueue(room: Room): SpawnRequest[] {
   const queue: SpawnRequest[] = [];
-  const sources = room.find(FIND_SOURCES).length;
+  const safeSourceCount = getSafeSourceCount(room);
   const rc = (room.mem as RoomMemory).role_count ?? {};
   const harvesterCount = rc.harvester ?? 0;
   const haulerCount = rc.hauler ?? 0;
@@ -21,31 +22,36 @@ function buildSpawnQueue(room: Room): SpawnRequest[] {
     queue.push({ priority: 0, role: "harvester", emergency: true });
   }
 
-  // Harvesters: 1 per source
-  if (harvesterCount < sources) {
-    queue.push({ priority: 1, role: "harvester", emergency: false });
+  // Per-source layering: harvester + 2 haulers per safe source
+  for (let i = 0; i < safeSourceCount; i++) {
+    const base = 10 * (i + 1);
+
+    if (harvesterCount <= i) {
+      queue.push({ priority: base, role: "harvester", emergency: false });
+    }
+    if (haulerCount <= i * 2) {
+      queue.push({ priority: base + 1, role: "hauler", emergency: false });
+    }
+    if (haulerCount <= i * 2 + 1) {
+      queue.push({ priority: base + 2, role: "hauler", emergency: false });
+    }
   }
 
-  // Haulers: 2 per source
-  if (haulerCount < sources * 2) {
-    queue.push({ priority: 2, role: "hauler", emergency: false });
-  }
-
-  // Upgraders: 1-2
+  // Upgraders: up to 2
   if (upgraderCount < 2) {
-    queue.push({ priority: 3, role: "upgrader", emergency: false });
+    queue.push({ priority: 100, role: "upgrader", emergency: false });
   }
 
   // Builders: only when construction sites exist, max 2
   const sites = room.find(FIND_CONSTRUCTION_SITES);
   if (sites.length > 0 && builderCount < 2) {
-    queue.push({ priority: 4, role: "builder", emergency: false });
+    queue.push({ priority: 110, role: "builder", emergency: false });
   }
 
   // Warriors: only when hostiles present
   const hostiles = room.find(FIND_HOSTILE_CREEPS);
   if (hostiles.length > 0 && warriorCount < 2) {
-    queue.push({ priority: 5, role: "warrior", emergency: false });
+    queue.push({ priority: 120, role: "warrior", emergency: false });
   }
 
   queue.sort((a, b) => a.priority - b.priority);

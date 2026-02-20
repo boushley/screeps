@@ -1,4 +1,5 @@
 import { reserve, slotCount } from "../reservations";
+import { getSafeSources } from "../room-analysis";
 import { RoleDefinition } from "./types";
 
 const WORK_COST = 100;
@@ -85,7 +86,10 @@ export const harvester: RoleDefinition = {
 
     // Find a new source via reservations
     if (!source) {
-      const sources = creep.room.find(FIND_SOURCES);
+      const safeIds = getSafeSources(creep.room);
+      const sources = safeIds
+        .map((id) => Game.getObjectById(id as Id<Source>))
+        .filter((s): s is Source => s !== null);
       const maxSlots = 1;
 
       // Filter to unreserved sources

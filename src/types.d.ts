@@ -32,6 +32,11 @@ interface RoomMemory {
     };
   };
   role_count?: Record<string, number>;
+  sourceAnalysis?: {
+    safeSourceIds: string[];
+    guardedSourceIds: string[];
+    calculatedAt: number;
+  };
 }
 
 interface Memory {

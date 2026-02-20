@@ -24,6 +24,10 @@ Always use the efficient memory system from `src/memory.ts` instead of the defau
 - **Prototype hijacks** (safe to use): `creep.mem`, `room.mem`, `spawn.mem`, `flag.mem`, `powerCreep.mem`
 - **Do NOT use `.memory`** — the Screeps engine defines it as non-configurable, and accessing it triggers the engine's default `Memory` parsing. Always use `.mem` instead.
 
+### Cached Calculations
+
+When caching computed data in memory (e.g., room analysis, path caches), always include a `calculatedAt: number` field set to `Game.time`. This enables staleness tracking — consumers can check `Game.time - data.calculatedAt` against a refresh interval to decide when to recompute.
+
 ## CPU Limits
 
 Screeps enforces strict CPU limits per tick. The CPU budget helpers live in `src/cpu.ts`:
