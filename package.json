@@ -7,7 +7,8 @@
   "scripts": {
     "build": "rollup -c",
     "copy": "npm run build && cat dist/main.js | pbcopy && echo 'Script copied!'",
-    "watch": "rollup -c --watch"
+    "watch": "rollup -c --watch",
+    "submit": "npm run build && node tools/submit.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.1.0",
