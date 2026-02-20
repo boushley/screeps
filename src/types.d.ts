@@ -31,6 +31,7 @@ interface RoomMemory {
       [targetId: string]: string[];
     };
   };
+  role_count?: Record<string, number>;
 }
 
 interface Memory {

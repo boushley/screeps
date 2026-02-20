@@ -6,24 +6,15 @@ interface SpawnRequest {
   emergency: boolean;
 }
 
-function countRole(role: string): number {
-  let count = 0;
-  for (const name in Game.creeps) {
-    if (Game.creeps[name].mem.role === role) {
-      count++;
-    }
-  }
-  return count;
-}
-
 function buildSpawnQueue(room: Room): SpawnRequest[] {
   const queue: SpawnRequest[] = [];
   const sources = room.find(FIND_SOURCES).length;
-  const harvesterCount = countRole("harvester");
-  const haulerCount = countRole("hauler");
-  const upgraderCount = countRole("upgrader");
-  const builderCount = countRole("builder");
-  const warriorCount = countRole("warrior");
+  const rc = (room.mem as RoomMemory).role_count ?? {};
+  const harvesterCount = rc.harvester ?? 0;
+  const haulerCount = rc.hauler ?? 0;
+  const upgraderCount = rc.upgrader ?? 0;
+  const builderCount = rc.builder ?? 0;
+  const warriorCount = rc.warrior ?? 0;
 
   // Emergency: zero harvesters
   if (harvesterCount === 0) {

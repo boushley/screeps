@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Screeps game scripts in TypeScript",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && cat dist/main.js | pbcopy && echo 'Script copied!'",
     "watch": "rollup -c --watch"
   },
   "devDependencies": {

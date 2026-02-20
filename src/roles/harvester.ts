@@ -32,8 +32,17 @@ export const harvester: RoleDefinition = {
   },
 
   run(creep: Creep): void {
-    // If we have energy, try to transfer to adjacent container/link/spawn/extension
+    // If we have energy, deliver it
     if (creep.store.getFreeCapacity() === 0) {
+      const haulerCount = (creep.room.mem as RoomMemory).role_count?.hauler ?? 0;
+
+      if (haulerCount > 0) {
+        // Haulers present — drop energy, stay at source
+        creep.drop(RESOURCE_ENERGY);
+        return;
+      }
+
+      // No haulers — self-deliver to spawns/extensions
       const target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
         filter: (s) =>
           (s.structureType === STRUCTURE_SPAWN ||
@@ -58,7 +67,7 @@ export const harvester: RoleDefinition = {
         }
         return;
       }
-      // Just drop it for haulers
+      // Nothing to deliver to — just drop it
       creep.drop(RESOURCE_ENERGY);
       return;
     }

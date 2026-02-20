@@ -1,4 +1,5 @@
 import { init as initMemory, save as saveMemory } from "./memory";
+import { scan as stateScan } from "./state-scan";
 import { init as initCpuBudget, hasCpu } from "./cpu";
 import { tickComplete as flushNotifications } from "./notify";
 import { run as runSpawn } from "./spawn";
@@ -38,6 +39,7 @@ function runCreeps(mem: Memory): void {
 
 export function loop(): void {
   const mem = initMemory();
+  stateScan(mem);
   initCpuBudget();
 
   const spawns = Object.values(Game.spawns);
