@@ -2,13 +2,11 @@ import { roles } from "./roles";
 import { getSafeSourceCount } from "./room-analysis";
 
 interface SpawnRequest {
-  priority: number;
   role: string;
   emergency: boolean;
 }
 
-function buildSpawnQueue(room: Room): SpawnRequest[] {
-  const queue: SpawnRequest[] = [];
+function getNextSpawnRequest(room: Room): SpawnRequest | null {
   const safeSourceCount = getSafeSourceCount(room);
   const rc = (room.mem as RoomMemory).role_count ?? {};
   const harvesterCount = rc.harvester ?? 0;
@@ -19,52 +17,47 @@ function buildSpawnQueue(room: Room): SpawnRequest[] {
 
   // Emergency: zero harvesters
   if (harvesterCount === 0) {
-    queue.push({ priority: 0, role: "harvester", emergency: true });
+    return { role: "harvester", emergency: true };
   }
 
   // Per-source layering: harvester + 2 haulers per safe source
   for (let i = 0; i < safeSourceCount; i++) {
-    const base = 10 * (i + 1);
-
     if (harvesterCount <= i) {
-      queue.push({ priority: base, role: "harvester", emergency: false });
+      return { role: "harvester", emergency: false };
     }
     if (haulerCount <= i * 2) {
-      queue.push({ priority: base + 1, role: "hauler", emergency: false });
+      return { role: "hauler", emergency: false };
     }
     if (haulerCount <= i * 2 + 1) {
-      queue.push({ priority: base + 2, role: "hauler", emergency: false });
+      return { role: "hauler", emergency: false };
     }
   }
 
   // Upgraders: up to 2
   if (upgraderCount < 2) {
-    queue.push({ priority: 100, role: "upgrader", emergency: false });
+    return { role: "upgrader", emergency: false };
   }
 
   // Builders: only when construction sites exist, max 2
   const sites = room.find(FIND_CONSTRUCTION_SITES);
   if (sites.length > 0 && builderCount < 2) {
-    queue.push({ priority: 110, role: "builder", emergency: false });
+    return { role: "builder", emergency: false };
   }
 
   // Warriors: only when hostiles present
   const hostiles = room.find(FIND_HOSTILE_CREEPS);
   if (hostiles.length > 0 && warriorCount < 2) {
-    queue.push({ priority: 120, role: "warrior", emergency: false });
+    return { role: "warrior", emergency: false };
   }
 
-  queue.sort((a, b) => a.priority - b.priority);
-  return queue;
+  return null;
 }
 
 export function run(spawn: StructureSpawn, mem: Memory): void {
   if (spawn.spawning) return;
 
-  const queue = buildSpawnQueue(spawn.room);
-  if (queue.length === 0) return;
-
-  const request = queue[0];
+  const request = getNextSpawnRequest(spawn.room);
+  if (!request) return;
   const role = roles[request.role];
   if (!role) return;
 
