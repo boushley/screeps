@@ -50,7 +50,7 @@ export function loop(): void {
 
   for (const spawn of spawns) {
     if (!hasCpu()) break;
-    runSpawn(spawn);
+    runSpawn(spawn, mem);
   }
 
   runCreeps(mem);

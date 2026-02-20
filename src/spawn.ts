@@ -52,7 +52,7 @@ function buildSpawnQueue(room: Room): SpawnRequest[] {
   return queue;
 }
 
-export function run(spawn: StructureSpawn): void {
+export function run(spawn: StructureSpawn, mem: Memory): void {
   if (spawn.spawning) return;
 
   const queue = buildSpawnQueue(spawn.room);
@@ -75,11 +75,10 @@ export function run(spawn: StructureSpawn): void {
   if (!body) return;
 
   const name = `${request.role}_${Game.time}_${spawn.name}`;
-  const result = spawn.spawnCreep(body, name, {
-    memory: { role: request.role } as CreepMemory,
-  });
+  const result = spawn.spawnCreep(body, name);
 
   if (result === OK) {
+    mem.creeps[name] = { role: request.role };
     console.log(`Spawning ${name} [${body.join(",")}]`);
   } else {
     console.log(`Failed spawning. Status: ${result} -- ${name} [${body.join(",")}]`);
