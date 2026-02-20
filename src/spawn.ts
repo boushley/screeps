@@ -1,9 +1,13 @@
 import { roles } from "./roles";
 import { getSafeSourceCount, getTotalSafeSourceHaulerSlots } from "./room-analysis";
+import { getRoomStrategy } from "./room-strategy";
+import { evaluateRoomThreat } from "./threat";
+import { WARRIOR_UNIT_COST } from "./roles/warrior";
 
 interface SpawnRequest {
   role: string;
   emergency: boolean;
+  minEnergy?: number;
 }
 
 function getNextSpawnRequest(room: Room): SpawnRequest | null {
@@ -15,6 +19,8 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
   const upgraderCount = rc.upgrader ?? 0;
   const builderCount = rc.builder ?? 0;
   const warriorCount = rc.warrior ?? 0;
+  const strategy = getRoomStrategy(room);
+  const threat = evaluateRoomThreat(room);
 
   // Emergency: zero harvesters
   if (harvesterCount === 0) {
@@ -36,20 +42,29 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
   if (haulerCount < desiredHaulerCount) {
     return { role: "hauler", emergency: false };
   }
-  if (upgraderCount < 2) {
+  if (upgraderCount < strategy.spawn.upgraderTarget) {
     return { role: "upgrader", emergency: false };
   }
 
   // Builders: only when construction sites exist, max 2
   const sites = room.find(FIND_CONSTRUCTION_SITES);
-  if (sites.length > 0 && builderCount < 2) {
+  if (sites.length > 0 && builderCount < strategy.spawn.builderCap) {
     return { role: "builder", emergency: false };
   }
 
-  // Warriors: only when hostiles present
-  const hostiles = room.find(FIND_HOSTILE_CREEPS);
-  if (hostiles.length > 0 && warriorCount < 2) {
-    return { role: "warrior", emergency: false };
+  // Warriors: react to threat assessment and strategy
+  if (threat.hostiles.length > 0) {
+    const desiredWarriors = Math.min(strategy.spawn.warrior.maxActive, Math.max(1, threat.requiredWarriorUnits));
+    if (warriorCount < desiredWarriors) {
+      const requiredUnits =
+        threat.level === "strong"
+          ? strategy.spawn.warrior.strongThreatUnits
+          : strategy.spawn.warrior.lightThreatUnits;
+      const minEnergy = requiredUnits * WARRIOR_UNIT_COST;
+      if (room.energyCapacityAvailable >= minEnergy) {
+        return { role: "warrior", emergency: false, minEnergy };
+      }
+    }
   }
 
   return null;
@@ -69,6 +84,10 @@ export function run(spawn: StructureSpawn, mem: Memory): void {
   // Skip the wait if no workers alive (bootstrap situation)
   const hasWorkers = Object.keys(Game.creeps).length > 0;
   if (!request.emergency && hasWorkers && energyAvailable < energyCapacityAvailable * 0.8) {
+    return;
+  }
+
+  if (request.minEnergy && energyAvailable < request.minEnergy) {
     return;
   }
 

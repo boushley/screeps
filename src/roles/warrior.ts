@@ -1,8 +1,16 @@
 import { RoleDefinition } from "./types";
+import {
+  evaluateRoomThreat,
+  getEngageableHostiles,
+  HostileThreat,
+  isHostileStrongerThanWarrior,
+  RoomThreatInfo,
+} from "../threat";
 
 const TOUGH_COST = 10;
 const ATTACK_COST = 80;
 const MOVE_COST = 50;
+export const WARRIOR_UNIT_COST = TOUGH_COST + ATTACK_COST + MOVE_COST * 2;
 
 export const warrior: RoleDefinition = {
   name: "warrior",
@@ -13,7 +21,7 @@ export const warrior: RoleDefinition = {
 
     const parts: BodyPartConstant[] = [];
     // Build in sets of TOUGH + ATTACK + MOVE + MOVE
-    const unitCost = TOUGH_COST + ATTACK_COST + MOVE_COST * 2;
+    const unitCost = WARRIOR_UNIT_COST;
     const units = Math.min(
       Math.floor(energy / unitCost),
       12, // stay under 50 body parts
@@ -29,18 +37,71 @@ export const warrior: RoleDefinition = {
   },
 
   run(creep: Creep): void {
-    // Find hostile creeps in room
-    const hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-    if (hostile) {
-      if (creep.attack(hostile) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(hostile);
+    const threat = evaluateRoomThreat(creep.room);
+    if (threat.hostiles.length > 0) {
+      const target = selectTarget(creep, threat);
+      if (target) {
+        engageTarget(creep, target);
+        return;
       }
-      return;
     }
 
-    // No hostiles — rally near controller
+    delete creep.mem.target;
+
+    // No suitable targets — rally near controller
     if (creep.room.controller) {
-      creep.moveTo(creep.room.controller);
+      creep.moveTo(creep.room.controller, { reusePath: 10 });
     }
   },
 };
+
+function selectTarget(creep: Creep, info: RoomThreatInfo): Creep | null {
+  const engageable = getEngageableHostiles(info);
+  const prioritized = prioritizeThreats(creep, engageable);
+
+  // Prefer existing target if still valid
+  if (creep.mem.target) {
+    const current = Game.getObjectById<Creep>(creep.mem.target);
+    if (current && prioritized.some((h) => h.creep.id === current.id)) {
+      return current;
+    }
+  }
+
+  const next = prioritized[0]?.creep ?? null;
+  if (next) {
+    creep.mem.target = next.id;
+  } else {
+    delete creep.mem.target;
+  }
+  return next;
+}
+
+function prioritizeThreats(creep: Creep, hostiles: HostileThreat[]): HostileThreat[] {
+  return hostiles
+    .filter((hostile) => {
+      if (hostile.threateningAssets) return true;
+      return !isHostileStrongerThanWarrior(hostile, creep);
+    })
+    .sort((a, b) => {
+      if (a.threateningAssets && !b.threateningAssets) return -1;
+      if (!a.threateningAssets && b.threateningAssets) return 1;
+      const rangeA = creep.pos.getRangeTo(a.creep);
+      const rangeB = creep.pos.getRangeTo(b.creep);
+      return rangeA - rangeB;
+    });
+}
+
+function engageTarget(creep: Creep, target: Creep): void {
+  const range = creep.pos.getRangeTo(target);
+  if (range <= 1) {
+    creep.attack(target);
+    return;
+  }
+
+  const moveResult = creep.moveTo(target, { reusePath: 5 });
+  if (moveResult === OK || moveResult === ERR_TIRED) {
+    if (range <= 3 && creep.getActiveBodyparts(ATTACK) > 0) {
+      creep.attack(target);
+    }
+  }
+}

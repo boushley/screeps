@@ -38,6 +38,7 @@ interface RoomMemory {
     haulerSlotsBySourceId: Record<string, number>;
     calculatedAt: number;
   };
+  strategyId?: import("./room-strategy").RoomStrategyId;
 }
 
 interface Memory {

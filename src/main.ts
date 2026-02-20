@@ -4,6 +4,7 @@ import { init as initCpuBudget, hasCpu } from "./cpu";
 import { tickComplete as flushNotifications } from "./notify";
 import { run as runSpawn } from "./spawn";
 import { roles } from "./roles";
+import { applyRoomStrategy } from "./room-strategy";
 
 function runCreeps(mem: Memory): void {
   const names = Object.keys(Game.creeps);
@@ -37,10 +38,18 @@ function runCreeps(mem: Memory): void {
   mem.game.creepRunIndex = 0;
 }
 
+function applyStrategies(): void {
+  for (const roomName in Game.rooms) {
+    if (!hasCpu()) return;
+    applyRoomStrategy(Game.rooms[roomName]);
+  }
+}
+
 export function loop(): void {
   const mem = initMemory();
   stateScan(mem);
   initCpuBudget();
+  applyStrategies();
 
   const spawns = Object.values(Game.spawns);
   if (spawns.length === 0) {
