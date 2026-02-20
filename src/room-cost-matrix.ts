@@ -159,6 +159,11 @@ export function getRoomCostMatrix(room: Room): CostMatrix {
   return getCached(room).matrix;
 }
 
+export function getTilePenalty(room: Room, pos: RoomPosition): number {
+  const matrix = getRoomCostMatrix(room);
+  return matrix.get(pos.x, pos.y);
+}
+
 export function applyRoomCosts(roomName: string, costMatrix: CostMatrix): void {
   const room = Game.rooms[roomName];
   if (!room) return;

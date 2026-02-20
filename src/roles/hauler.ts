@@ -2,7 +2,7 @@ import { RoleDefinition } from "./types";
 import { runStateMachine, StateMap } from "../state-machine";
 import { releaseAll, reserve, slotCount } from "../reservations";
 import { getHaulerSlotsForSource } from "../room-analysis";
-import { applyRoomCosts, findLowCostSpot } from "../room-cost-matrix";
+import { applyRoomCosts, findLowCostSpot, getTilePenalty } from "../room-cost-matrix";
 
 const CARRY_COST = 50;
 const MOVE_COST = 50;
@@ -298,27 +298,62 @@ function deliverToTarget(creep: Creep, target: Structure | Creep): void {
 }
 
 function parkHauler(creep: Creep): void {
-  const parking = getParkingPosition(creep);
-  if (!parking) return;
-  if (creep.pos.isEqualTo(parking)) return;
-  moveWithCosts(creep, parking, 0);
+  const currentPenalty = getTilePenalty(creep.room, creep.pos);
+  if (currentPenalty <= 3) {
+    delete creep.mem.parkingPos;
+    return;
+  }
+
+  const next = stepOffHighCostTile(creep, currentPenalty);
+  if (next && !creep.pos.isEqualTo(next)) {
+    moveWithCosts(creep, next, 0);
+    return;
+  }
+
+  const fallback = getParkingPosition(creep, 1, 2);
+  if (fallback && !creep.pos.isEqualTo(fallback)) {
+    moveWithCosts(creep, fallback, 0);
+  }
 }
 
-function getParkingPosition(creep: Creep): RoomPosition | null {
+function getParkingPosition(creep: Creep, minRange: number, maxRange: number): RoomPosition | null {
   if (creep.mem.parkingPos) {
     const pos = decodePosition(creep.mem.parkingPos);
     if (pos && pos.roomName === creep.room.name) {
       return pos;
     }
+    delete creep.mem.parkingPos;
   }
 
   const origin = creep.room.controller?.pos ?? creep.pos;
-  const spot = findLowCostSpot(creep.room, origin, 2, 6);
+  const spot = findLowCostSpot(creep.room, origin, minRange, maxRange);
   if (spot) {
     creep.mem.parkingPos = encodePosition(spot);
     return spot;
   }
   return null;
+}
+
+function stepOffHighCostTile(creep: Creep, currentPenalty: number): RoomPosition | null {
+  let bestPos: RoomPosition | null = null;
+  let bestPenalty = currentPenalty;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      const x = creep.pos.x + dx;
+      const y = creep.pos.y + dy;
+      if (x < 0 || x > 49 || y < 0 || y > 49) continue;
+      const pos = new RoomPosition(x, y, creep.room.name);
+      if (pos.lookFor(LOOK_TERRAIN)[0] === "wall") continue;
+      const penalty = getTilePenalty(creep.room, pos);
+      if (penalty < bestPenalty - 1) {
+        bestPenalty = penalty;
+        bestPos = pos;
+      }
+    }
+  }
+
+  return bestPos;
 }
 
 function encodePosition(pos: RoomPosition): string {

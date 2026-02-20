@@ -31,6 +31,45 @@ export interface RoomStrategy {
 
 const STRATEGY_OVERRIDES: Record<string, RoomStrategyId> = {};
 
+function ensurePrimaryRoomName(preferred?: Room): string | null {
+  let primary: Room | null = null;
+  const owned: Room[] = [];
+
+  for (const roomName in Game.rooms) {
+    const current = Game.rooms[roomName];
+    if (!current.controller || !current.controller.my) continue;
+    owned.push(current);
+    if (!primary && current.mem.isPrimaryRoom) {
+      primary = current;
+    }
+  }
+
+  if (!primary) {
+    if (preferred && preferred.controller && preferred.controller.my) {
+      primary = preferred;
+    } else if (owned.length > 0) {
+      owned.sort((a, b) => a.name.localeCompare(b.name));
+      primary = owned[0];
+    }
+
+    if (primary) {
+      primary.mem.isPrimaryRoom = true;
+    }
+  }
+
+  if (!primary) return null;
+
+  for (const room of owned) {
+    if (room.name === primary.name) {
+      room.mem.isPrimaryRoom = true;
+    } else if (room.mem.isPrimaryRoom) {
+      delete room.mem.isPrimaryRoom;
+    }
+  }
+
+  return primary.name;
+}
+
 const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
   core: {
     id: "core",
@@ -114,9 +153,16 @@ function resolveStrategyId(room: Room): RoomStrategyId {
     return override;
   }
 
-  const inferred: RoomStrategyId = room.controller && room.controller.level <= 2 ? "border" : "core";
-  room.mem.strategyId = inferred;
-  return inferred;
+  const primaryName = ensurePrimaryRoomName(room);
+  if (primaryName) {
+    const inferred: RoomStrategyId = room.name === primaryName ? "core" : "border";
+    room.mem.strategyId = inferred;
+    return inferred;
+  }
+
+  const fallback: RoomStrategyId = room.controller && room.controller.level <= 2 ? "border" : "core";
+  room.mem.strategyId = fallback;
+  return fallback;
 }
 
 export function setRoomStrategy(room: Room, strategyId: RoomStrategyId): void {

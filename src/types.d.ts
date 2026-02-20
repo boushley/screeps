@@ -51,6 +51,7 @@ interface RoomMemory {
     calculatedAt: number;
   };
   costMatrixDirty?: boolean;
+  isPrimaryRoom?: boolean;
 }
 
 interface Memory {
