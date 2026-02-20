@@ -35,6 +35,7 @@ interface RoomMemory {
   sourceAnalysis?: {
     safeSourceIds: string[];
     guardedSourceIds: string[];
+    haulerSlotsBySourceId: Record<string, number>;
     calculatedAt: number;
   };
 }

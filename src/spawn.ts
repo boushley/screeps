@@ -1,5 +1,5 @@
 import { roles } from "./roles";
-import { getSafeSourceCount } from "./room-analysis";
+import { getSafeSourceCount, getTotalSafeSourceHaulerSlots } from "./room-analysis";
 
 interface SpawnRequest {
   role: string;
@@ -8,6 +8,7 @@ interface SpawnRequest {
 
 function getNextSpawnRequest(room: Room): SpawnRequest | null {
   const safeSourceCount = getSafeSourceCount(room);
+  const desiredHaulerCount = getTotalSafeSourceHaulerSlots(room);
   const rc = (room.mem as RoomMemory).role_count ?? {};
   const harvesterCount = rc.harvester ?? 0;
   const haulerCount = rc.hauler ?? 0;
@@ -20,21 +21,20 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
     return { role: "harvester", emergency: true };
   }
 
-  // Per-source layering: harvester + 2 haulers per safe source
   for (let i = 0; i < safeSourceCount; i++) {
-    if (harvesterCount <= i) {
+    if (harvesterCount < i) {
       return { role: "harvester", emergency: false };
     }
-    if (haulerCount <= i * 2) {
-      return { role: "hauler", emergency: false };
-    }
-    if (haulerCount <= i * 2 + 1) {
+    if (haulerCount < i) {
       return { role: "hauler", emergency: false };
     }
   }
 
-  // Upgraders: up to 2
-  if (upgraderCount < 2) {
+  if (haulerCount < desiredHaulerCount) {
+    return { role: "hauler", emergency: false };
+  }
+
+  if (upgraderCount < 1) {
     return { role: "upgrader", emergency: false };
   }
 
