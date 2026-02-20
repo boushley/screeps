@@ -1,4 +1,11 @@
-import { ConstructionDirective, ensureAdditionalSpawns, extensionsNearAnchor, rampartsFor, runConstructionPlan } from "./room-construction";
+import {
+  ConstructionDirective,
+  ensureAdditionalSpawns,
+  extensionsNearAnchor,
+  rampartsFor,
+  runConstructionPlan,
+  placeStorageConstruction,
+} from "./room-construction";
 
 export type RoomStrategyId = "core" | "border";
 
@@ -12,6 +19,7 @@ export interface SpawnPreferences {
   upgraderTarget: number;
   builderCap: number;
   warrior: WarriorSpawnPolicy;
+  haulerTarget: number;
 }
 
 export interface RoomStrategy {
@@ -30,6 +38,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
     spawn: {
       upgraderTarget: 3,
       builderCap: 2,
+      haulerTarget: 3,
       warrior: {
         maxActive: 2,
         lightThreatUnits: 1,
@@ -41,6 +50,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
       extensionsNearAnchor({ minRcl: 4, maxExtensions: 30, anchor: "spawn" }),
       extensionsNearAnchor({ minRcl: 6, maxExtensions: 50, anchor: "storage" }),
       ensureAdditionalSpawns({ minRcl: 6, maxSpawns: 2 }),
+      storageDirective({ minRcl: 4, minSpawnFill: 0.7, minHaulers: 3, cooldown: 500 }),
     ],
   },
   border: {
@@ -49,6 +59,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
     spawn: {
       upgraderTarget: 1,
       builderCap: 1,
+      haulerTarget: 2,
       warrior: {
         maxActive: 4,
         lightThreatUnits: 2,
@@ -59,9 +70,39 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
       extensionsNearAnchor({ minRcl: 2, maxExtensions: 8, anchor: "spawn" }),
       rampartsFor({ minRcl: 2, targets: ["spawn", "controller", "storage"] }),
       ensureAdditionalSpawns({ minRcl: 6, maxSpawns: 2 }),
+      storageDirective({ minRcl: 4, minSpawnFill: 0.8, minHaulers: 2, cooldown: 500 }),
     ],
   },
 };
+
+function storageDirective(options: {
+  minRcl: number;
+  minSpawnFill: number;
+  minHaulers: number;
+  cooldown: number;
+}): ConstructionDirective {
+  return (room: Room, context) => {
+    if (!room.controller || room.controller.level < options.minRcl) return;
+    if (context.spawnFillAvg < options.minSpawnFill) return;
+    if ((context.roleCounts.hauler ?? 0) < options.minHaulers) return;
+    if (room.storage) return;
+    const existingSite = room.find(FIND_MY_CONSTRUCTION_SITES, {
+      filter: (site) => site.structureType === STRUCTURE_STORAGE,
+    });
+    if (existingSite.length > 0) return;
+
+    const data = room.mem.strategyData ?? (room.mem.strategyData = {});
+    if (data.lastStorageAttempt && Game.time - data.lastStorageAttempt < options.cooldown) {
+      return;
+    }
+
+    if (placeStorageConstruction(room)) {
+      data.lastStorageAttempt = Game.time;
+    } else {
+      data.lastStorageAttempt = Game.time;
+    }
+  };
+}
 
 function resolveStrategyId(room: Room): RoomStrategyId {
   const stored = room.mem.strategyId;
@@ -92,5 +133,15 @@ export function getRoomStrategy(room: Room): RoomStrategy {
 export function applyRoomStrategy(room: Room): void {
   const strategy = getRoomStrategy(room);
   if (!strategy || strategy.constructionDirectives.length === 0) return;
-  runConstructionPlan(room, strategy.constructionDirectives);
+  const data = room.mem.strategyData ?? (room.mem.strategyData = {});
+  const capacity = room.energyCapacityAvailable || 1;
+  const currentFill = room.energyAvailable / capacity;
+  const alpha = 0.1;
+  data.spawnFillAvg = data.spawnFillAvg === undefined ? currentFill : data.spawnFillAvg * (1 - alpha) + currentFill * alpha;
+
+  const roleCounts = room.mem.role_count ?? {};
+  runConstructionPlan(room, strategy.constructionDirectives, {
+    spawnFillAvg: data.spawnFillAvg,
+    roleCounts,
+  });
 }

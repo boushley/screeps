@@ -18,6 +18,8 @@ interface CreepMemory {
   task?: string;
   target?: Id<any>;
   reservations?: CreepReservation[];
+  deliveryTarget?: Id<any>;
+  parkingPos?: string;
 }
 
 interface GameMemory {
@@ -39,6 +41,16 @@ interface RoomMemory {
     calculatedAt: number;
   };
   strategyId?: import("./room-strategy").RoomStrategyId;
+  strategyData?: {
+    spawnFillAvg?: number;
+    lastStorageAttempt?: number;
+  };
+  costMatrix?: {
+    serialized: number[];
+    penalties: number[];
+    calculatedAt: number;
+  };
+  costMatrixDirty?: boolean;
 }
 
 interface Memory {

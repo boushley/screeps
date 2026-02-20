@@ -1,6 +1,12 @@
 import { hasCpu } from "./cpu";
+import { markRoomCostMatrixDirty } from "./room-cost-matrix";
 
-export type ConstructionDirective = (room: Room) => void;
+export interface ConstructionContext {
+  spawnFillAvg: number;
+  roleCounts: Record<string, number>;
+}
+
+export type ConstructionDirective = (room: Room, context: ConstructionContext) => void;
 
 const MAX_EXTENSION_SCAN_RADIUS = 8;
 const MAX_SPAWN_SCAN_RADIUS = 10;
@@ -62,7 +68,7 @@ export function extensionsNearAnchor(options: {
   maxExtensions: number;
   anchor: "spawn" | "controller" | "storage";
 }): ConstructionDirective {
-  return (room: Room) => {
+  return (room: Room, _context: ConstructionContext) => {
     if (!room.controller || room.controller.level < options.minRcl) return;
     if (!hasCpu(0.5)) return;
 
@@ -75,6 +81,7 @@ export function extensionsNearAnchor(options: {
       if (!spot) continue;
       const result = spot.createConstructionSite(STRUCTURE_EXTENSION);
       if (result === OK) {
+        markRoomCostMatrixDirty(room);
         return;
       }
     }
@@ -88,14 +95,20 @@ function ensureRampartAt(pos: RoomPosition): void {
     .lookFor(LOOK_CONSTRUCTION_SITES)
     .some((s) => s.structureType === STRUCTURE_RAMPART);
   if (site) return;
-  pos.createConstructionSite(STRUCTURE_RAMPART);
+  const result = pos.createConstructionSite(STRUCTURE_RAMPART);
+  if (result === OK) {
+    const room = Game.rooms[pos.roomName];
+    if (room) {
+      markRoomCostMatrixDirty(room);
+    }
+  }
 }
 
 export function rampartsFor(options: {
   minRcl: number;
   targets: Array<"spawn" | "controller" | "storage">;
 }): ConstructionDirective {
-  return (room: Room) => {
+  return (room: Room, _context: ConstructionContext) => {
     if (!room.controller || room.controller.level < options.minRcl) return;
     if (!hasCpu(0.2)) return;
     for (const target of options.targets) {
@@ -111,7 +124,7 @@ export function ensureAdditionalSpawns(options: {
   minRcl: number;
   maxSpawns: number;
 }): ConstructionDirective {
-  return (room: Room) => {
+  return (room: Room, _context: ConstructionContext) => {
     if (!room.controller || room.controller.level < options.minRcl) return;
     const built = room.find(FIND_MY_SPAWNS).length;
     const queued = room.find(FIND_MY_CONSTRUCTION_SITES, {
@@ -126,15 +139,37 @@ export function ensureAdditionalSpawns(options: {
       if (!spot) continue;
       const result = spot.createConstructionSite(STRUCTURE_SPAWN);
       if (result === OK) {
+        markRoomCostMatrixDirty(room);
         return;
       }
     }
   };
 }
 
-export function runConstructionPlan(room: Room, directives: ConstructionDirective[]): void {
+function findStorageSpot(room: Room): RoomPosition | null {
+  if (!room.controller) return null;
+  const anchor = room.controller.pos;
+  return findBuildSpot(room, anchor, 6);
+}
+
+export function placeStorageConstruction(room: Room): boolean {
+  const spot = findStorageSpot(room);
+  if (!spot) return false;
+  const result = spot.createConstructionSite(STRUCTURE_STORAGE);
+  if (result === OK) {
+    markRoomCostMatrixDirty(room);
+    return true;
+  }
+  return false;
+}
+
+export function runConstructionPlan(
+  room: Room,
+  directives: ConstructionDirective[],
+  context: ConstructionContext,
+): void {
   for (const directive of directives) {
     if (!hasCpu(0.2)) break;
-    directive(room);
+    directive(room, context);
   }
 }
