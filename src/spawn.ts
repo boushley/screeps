@@ -30,11 +30,13 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
     }
   }
 
+  if (harvesterCount < safeSourceCount) {
+    return { role: "harvester", emergency: false };
+  }
   if (haulerCount < desiredHaulerCount) {
     return { role: "hauler", emergency: false };
   }
-
-  if (upgraderCount < 1) {
+  if (upgraderCount < 2) {
     return { role: "upgrader", emergency: false };
   }
 
