@@ -76,7 +76,7 @@ Follow that document's state machine conventions.
 ## Build Commands
 
 - Install: `npm install`
-- Build: `npm run build` (outputs `dist/main.js`) and copies it to clipboard
+- Build: `npm run build` (outputs `dist/main.js`)
 - Watch: `npm run watch`
 - Validation without clipboard hang: use `npx tsc --noEmit` for type-check only, or `npx rollup -c` to verify bundle generation without `pbcopy`.
 
