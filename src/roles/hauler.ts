@@ -6,6 +6,9 @@ import { applyRoomCosts, findLowCostSpot, getTilePenalty } from "../room-cost-ma
 
 const CARRY_COST = 50;
 const MOVE_COST = 50;
+const MIN_TRANSFER_AMOUNT = 10;
+const DISTRIBUTION_RANGE = 3;
+const LOW_ENERGY_RATIO = 0.2;
 
 const STATE_COLLECTING = 'collecting' as const;
 const STATE_DELIVERING = 'delivering' as const;
@@ -172,6 +175,10 @@ function runDelivering(creep: Creep): void {
     return;
   }
 
+  if (dropIfLowEnergy(creep)) {
+    return;
+  }
+
   parkHauler(creep);
 }
 
@@ -216,9 +223,9 @@ function moveWithCosts(creep: Creep, target: RoomPosition | { pos: RoomPosition 
   });
 }
 
-function needsEnergy(target: Structure | Creep): boolean {
+function needsEnergy(target: Structure | Creep, minAmount = 1): boolean {
   if ("store" in target) {
-    return target.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+    return target.store.getFreeCapacity(RESOURCE_ENERGY) >= minAmount;
   }
   return false;
 }
@@ -226,7 +233,7 @@ function needsEnergy(target: Structure | Creep): boolean {
 function resolveDeliveryTarget(creep: Creep): Structure | Creep | null {
   if (creep.mem.deliveryTarget) {
     const existing = Game.getObjectById<Structure | Creep>(creep.mem.deliveryTarget);
-    if (existing && needsEnergy(existing)) {
+    if (existing && needsEnergy(existing, MIN_TRANSFER_AMOUNT)) {
       return existing;
     }
     delete creep.mem.deliveryTarget;
@@ -246,7 +253,7 @@ function selectDeliveryTarget(creep: Creep): Structure | Creep | null {
       (s.structureType === STRUCTURE_SPAWN ||
         s.structureType === STRUCTURE_EXTENSION ||
         s.structureType === STRUCTURE_TOWER) &&
-      needsEnergy(s),
+      needsEnergy(s, MIN_TRANSFER_AMOUNT),
   });
   if (critical) return critical;
 
@@ -258,20 +265,20 @@ function selectDeliveryTarget(creep: Creep): Structure | Creep | null {
   });
   if (worker) return worker;
 
-  if (creep.room.storage && needsEnergy(creep.room.storage)) {
+  if (creep.room.storage && needsEnergy(creep.room.storage, MIN_TRANSFER_AMOUNT)) {
     return creep.room.storage;
   }
 
   const controller = creep.room.controller;
   if (controller) {
     const container = controller.pos.findInRange(FIND_STRUCTURES, 3, {
-      filter: (s) => s.structureType === STRUCTURE_CONTAINER && needsEnergy(s),
+      filter: (s) => s.structureType === STRUCTURE_CONTAINER && needsEnergy(s, MIN_TRANSFER_AMOUNT),
     })[0];
     if (container) return container;
   }
 
   const containers = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: (s) => s.structureType === STRUCTURE_CONTAINER && needsEnergy(s),
+    filter: (s) => s.structureType === STRUCTURE_CONTAINER && needsEnergy(s, MIN_TRANSFER_AMOUNT),
   });
   if (containers) return containers;
 
@@ -279,6 +286,28 @@ function selectDeliveryTarget(creep: Creep): Structure | Creep | null {
 }
 
 function deliverToTarget(creep: Creep, target: Structure | Creep): void {
+  if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+    delete creep.mem.deliveryTarget;
+    return;
+  }
+
+  if (dropIfLowEnergy(creep)) {
+    return;
+  }
+
+  if (!needsEnergy(target, MIN_TRANSFER_AMOUNT)) {
+    delete creep.mem.deliveryTarget;
+    if (!moveToLocalTarget(creep, new Set([target.id as Id<any>]))) {
+      dropIfLowEnergy(creep);
+    }
+    return;
+  }
+
+  if (!creep.pos.inRangeTo(target, 1)) {
+    moveWithCosts(creep, target, 1);
+    return;
+  }
+
   const result = creep.transfer(target as any, RESOURCE_ENERGY);
   if (result === ERR_NOT_IN_RANGE) {
     moveWithCosts(creep, target, 1);
@@ -286,15 +315,126 @@ function deliverToTarget(creep: Creep, target: Structure | Creep): void {
   }
 
   if (result === OK) {
-    if (!needsEnergy(target) || creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+    if (isCreep(target)) {
       delete creep.mem.deliveryTarget;
+      const nextTarget = findLocalDeliveryTarget(
+        creep,
+        DISTRIBUTION_RANGE,
+        MIN_TRANSFER_AMOUNT,
+        new Set<Id<any>>(),
+      );
+      if (nextTarget) {
+        creep.mem.deliveryTarget = nextTarget.id as Id<any>;
+      }
+    } else if (!needsEnergy(target, MIN_TRANSFER_AMOUNT) || creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+      delete creep.mem.deliveryTarget;
+    }
+    if (dropIfLowEnergy(creep)) {
+      return;
     }
     return;
   }
 
   if (result === ERR_FULL || result === ERR_INVALID_TARGET) {
     delete creep.mem.deliveryTarget;
+    if (!moveToLocalTarget(creep)) {
+      dropIfLowEnergy(creep);
+    }
   }
+}
+
+function isCreep(target: Structure | Creep): target is Creep {
+  return !("structureType" in target);
+}
+
+function findLocalDeliveryTarget(
+  creep: Creep,
+  range: number,
+  minFree: number,
+  exclude: Set<Id<any>>,
+): Structure | Creep | null {
+  const critical = creep.pos.findInRange(FIND_MY_STRUCTURES, range, {
+    filter: (s) =>
+      (s.structureType === STRUCTURE_SPAWN ||
+        s.structureType === STRUCTURE_EXTENSION ||
+        s.structureType === STRUCTURE_TOWER) &&
+      needsEnergy(s, minFree) &&
+      !exclude.has(s.id as Id<any>),
+  });
+  if (critical.length > 0) {
+    return creep.pos.findClosestByRange(critical) ?? null;
+  }
+
+  const workers = creep.pos.findInRange(FIND_MY_CREEPS, range, {
+    filter: (c) =>
+      c.id !== creep.id &&
+      (c.mem.role === "builder" || c.mem.role === "upgrader") &&
+      needsEnergy(c, minFree) &&
+      !exclude.has(c.id as Id<any>),
+  });
+  if (workers.length > 0) {
+    return creep.pos.findClosestByRange(workers) ?? null;
+  }
+
+  const storage = creep.room.storage;
+  if (storage && storage.pos.inRangeTo(creep.pos, range) && needsEnergy(storage, minFree) && !exclude.has(storage.id as Id<any>)) {
+    return storage;
+  }
+
+  const containers = creep.pos.findInRange(FIND_STRUCTURES, range, {
+    filter: (s) =>
+      s.structureType === STRUCTURE_CONTAINER &&
+      needsEnergy(s, minFree) &&
+      !exclude.has(s.id as Id<any>),
+  });
+  if (containers.length > 0) {
+    return creep.pos.findClosestByRange(containers) ?? null;
+  }
+
+  return null;
+}
+
+function moveToLocalTarget(creep: Creep, exclude: Set<Id<any>> = new Set<Id<any>>()): boolean {
+  const target = findLocalDeliveryTarget(creep, DISTRIBUTION_RANGE, MIN_TRANSFER_AMOUNT, exclude);
+  if (!target) {
+    return false;
+  }
+
+  if (!needsEnergy(target, MIN_TRANSFER_AMOUNT)) {
+    return false;
+  }
+
+  creep.mem.deliveryTarget = target.id as Id<any>;
+
+  if (creep.pos.inRangeTo(target, 1)) {
+    const result = creep.transfer(target as any, RESOURCE_ENERGY);
+    if (result === ERR_NOT_IN_RANGE) {
+      moveWithCosts(creep, target, 1);
+    }
+    return true;
+  }
+
+  moveWithCosts(creep, target, 1);
+  return true;
+}
+
+function dropIfLowEnergy(creep: Creep): boolean {
+  const used = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+  if (used === 0) return false;
+  const capacity = creep.store.getCapacity(RESOURCE_ENERGY);
+  if (capacity === 0) return false;
+  if (used >= capacity * LOW_ENERGY_RATIO) return false;
+
+  if (findLocalDeliveryTarget(creep, DISTRIBUTION_RANGE, MIN_TRANSFER_AMOUNT, new Set<Id<any>>())) {
+    return false;
+  }
+
+  if (creep.drop(RESOURCE_ENERGY) === OK) {
+    delete creep.mem.deliveryTarget;
+    creep.mem.task = STATE_COLLECTING;
+    return true;
+  }
+  return false;
 }
 
 function parkHauler(creep: Creep): void {
