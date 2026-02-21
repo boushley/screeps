@@ -52,14 +52,17 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
     return { role: "builder", emergency: false };
   }
 
-  // Warriors: react to threat assessment and strategy
-  if (threat.hostiles.length > 0) {
-    const desiredWarriors = Math.min(strategy.spawn.warrior.maxActive, Math.max(1, threat.requiredWarriorUnits));
+  // Warriors: react only to actionable threats (active attackers or source keepers)
+  if (threat.actionableHostiles.length > 0) {
+    const desiredWarriors = Math.min(
+      strategy.spawn.warrior.maxActive,
+      Math.max(1, threat.actionableRequiredWarriorUnits),
+    );
     if (warriorCount < desiredWarriors) {
-      const requiredUnits =
-        threat.level === "strong"
-          ? strategy.spawn.warrior.strongThreatUnits
-          : strategy.spawn.warrior.lightThreatUnits;
+      const actionableStrong = threat.actionableHostiles.some((h) => h.isStrong);
+      const requiredUnits = actionableStrong
+        ? strategy.spawn.warrior.strongThreatUnits
+        : strategy.spawn.warrior.lightThreatUnits;
       const minEnergy = requiredUnits * WARRIOR_UNIT_COST;
       if (room.energyCapacityAvailable >= minEnergy) {
         return { role: "warrior", emergency: false, minEnergy };

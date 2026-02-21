@@ -8,6 +8,8 @@ export interface HostileThreat {
   requiredUnits: number;
   threateningAssets: boolean;
   isStrong: boolean;
+  isSourceKeeper: boolean;
+  actionable: boolean;
 }
 
 export interface RoomThreatInfo {
@@ -15,6 +17,8 @@ export interface RoomThreatInfo {
   hostiles: HostileThreat[];
   requiredWarriorUnits: number;
   strongHostilesThreatening: boolean;
+  actionableHostiles: HostileThreat[];
+  actionableRequiredWarriorUnits: number;
 }
 
 const cache = new Map<string, { tick: number; info: RoomThreatInfo }>();
@@ -59,6 +63,8 @@ export function evaluateRoomThreat(room: Room): RoomThreatInfo {
       hostiles: [],
       requiredWarriorUnits: 0,
       strongHostilesThreatening: false,
+      actionableHostiles: [],
+      actionableRequiredWarriorUnits: 0,
     };
     cache.set(room.name, { tick: Game.time, info });
     return info;
@@ -66,7 +72,9 @@ export function evaluateRoomThreat(room: Room): RoomThreatInfo {
 
   let strongThreatening = false;
   let totalUnits = 0;
+  let actionableUnits = 0;
   const hostileData: HostileThreat[] = [];
+  const actionableHostiles: HostileThreat[] = [];
 
   for (const hostile of hostiles) {
     const score = calculateHostileScore(hostile);
@@ -74,20 +82,28 @@ export function evaluateRoomThreat(room: Room): RoomThreatInfo {
     const requiredUnits = determineRequiredUnits(score, isSourceKeeper);
     const threatening = isThreateningAssets(hostile);
     const isStrong = isSourceKeeper || score >= 10;
+    const actionable = threatening || isSourceKeeper;
 
     if (isStrong && threatening) {
       strongThreatening = true;
     }
 
-    hostileData.push({
+    const data: HostileThreat = {
       creep: hostile,
       score,
       requiredUnits,
       threateningAssets: threatening,
       isStrong,
-    });
+      isSourceKeeper,
+      actionable,
+    };
+    hostileData.push(data);
 
     totalUnits += requiredUnits;
+    if (actionable) {
+      actionableUnits += requiredUnits;
+      actionableHostiles.push(data);
+    }
   }
 
   const info: RoomThreatInfo = {
@@ -95,6 +111,8 @@ export function evaluateRoomThreat(room: Room): RoomThreatInfo {
     hostiles: hostileData,
     requiredWarriorUnits: totalUnits,
     strongHostilesThreatening: strongThreatening,
+    actionableHostiles,
+    actionableRequiredWarriorUnits: actionableUnits,
   };
 
   cache.set(room.name, { tick: Game.time, info });
@@ -110,5 +128,5 @@ export function isHostileStrongerThanWarrior(hostile: HostileThreat, creep: Cree
 }
 
 export function getEngageableHostiles(info: RoomThreatInfo): HostileThreat[] {
-  return info.hostiles.filter((h) => !h.isStrong || h.threateningAssets);
+  return info.actionableHostiles;
 }

@@ -1,4 +1,5 @@
 import { RoleDefinition } from "./types";
+import { getRoomStrategy } from "../room-strategy";
 import {
   evaluateRoomThreat,
   getEngageableHostiles,
@@ -38,22 +39,38 @@ export const warrior: RoleDefinition = {
 
   run(creep: Creep): void {
     const threat = evaluateRoomThreat(creep.room);
-    if (threat.hostiles.length > 0) {
-      const target = selectTarget(creep, threat);
-      if (target) {
-        engageTarget(creep, target);
-        return;
-      }
+    if (threat.actionableHostiles.length === 0) {
+      rally(creep);
+      return;
     }
 
-    delete creep.mem.target;
-
-    // No suitable targets — rally near controller
-    if (creep.room.controller) {
-      creep.moveTo(creep.room.controller, { reusePath: 10 });
+    const strategy = getRoomStrategy(creep.room);
+    const desiredWarriors = Math.min(
+      strategy.spawn.warrior.maxActive,
+      Math.max(1, threat.actionableRequiredWarriorUnits),
+    );
+    const warriorCount = creep.room.mem.role_count?.warrior ?? 0;
+    if (warriorCount < desiredWarriors) {
+      rally(creep);
+      return;
     }
+
+    const target = selectTarget(creep, threat);
+    if (target) {
+      engageTarget(creep, target);
+      return;
+    }
+
+    rally(creep);
   },
 };
+
+function rally(creep: Creep): void {
+  delete creep.mem.target;
+  if (creep.room.controller) {
+    creep.moveTo(creep.room.controller, { reusePath: 10 });
+  }
+}
 
 function selectTarget(creep: Creep, info: RoomThreatInfo): Creep | null {
   const engageable = getEngageableHostiles(info);
