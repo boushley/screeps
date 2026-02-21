@@ -6,7 +6,7 @@ export interface ConstructionContext {
   roleCounts: Record<string, number>;
 }
 
-export type ConstructionDirective = (room: Room, context: ConstructionContext) => void;
+export type ConstructionDirective = (room: Room, context: ConstructionContext) => boolean;
 
 const MAX_EXTENSION_SCAN_RADIUS = 8;
 const MAX_SPAWN_SCAN_RADIUS = 10;
@@ -69,11 +69,11 @@ export function extensionsNearAnchor(options: {
   anchor: "spawn" | "controller" | "storage";
 }): ConstructionDirective {
   return (room: Room, _context: ConstructionContext) => {
-    if (!room.controller || room.controller.level < options.minRcl) return;
-    if (!hasCpu(0.5)) return;
+    if (!room.controller || room.controller.level < options.minRcl) return false;
+    if (!hasCpu(0.5)) return false;
 
     const total = countExisting(room, STRUCTURE_EXTENSION);
-    if (total >= options.maxExtensions) return;
+    if (total >= options.maxExtensions) return false;
 
     const anchors = getAnchorPositions(room, options.anchor);
     for (const anchor of anchors) {
@@ -82,26 +82,30 @@ export function extensionsNearAnchor(options: {
       const result = spot.createConstructionSite(STRUCTURE_EXTENSION);
       if (result === OK) {
         markRoomCostMatrixDirty(room);
-        return;
+        return true;
       }
     }
+
+    return false;
   };
 }
 
-function ensureRampartAt(pos: RoomPosition): void {
+function ensureRampartAt(pos: RoomPosition): boolean {
   const existing = pos.lookFor(LOOK_STRUCTURES).some((s) => s.structureType === STRUCTURE_RAMPART);
-  if (existing) return;
+  if (existing) return false;
   const site = pos
     .lookFor(LOOK_CONSTRUCTION_SITES)
     .some((s) => s.structureType === STRUCTURE_RAMPART);
-  if (site) return;
+  if (site) return false;
   const result = pos.createConstructionSite(STRUCTURE_RAMPART);
   if (result === OK) {
     const room = Game.rooms[pos.roomName];
     if (room) {
       markRoomCostMatrixDirty(room);
     }
+    return true;
   }
+  return false;
 }
 
 export function rampartsFor(options: {
@@ -109,14 +113,17 @@ export function rampartsFor(options: {
   targets: Array<"spawn" | "controller" | "storage">;
 }): ConstructionDirective {
   return (room: Room, _context: ConstructionContext) => {
-    if (!room.controller || room.controller.level < options.minRcl) return;
-    if (!hasCpu(0.2)) return;
+    if (!room.controller || room.controller.level < options.minRcl) return false;
+    if (!hasCpu(0.2)) return false;
     for (const target of options.targets) {
       const anchors = getAnchorPositions(room, target);
       for (const anchor of anchors) {
-        ensureRampartAt(anchor);
+        if (ensureRampartAt(anchor)) {
+          return true;
+        }
       }
     }
+    return false;
   };
 }
 
@@ -125,13 +132,13 @@ export function ensureAdditionalSpawns(options: {
   maxSpawns: number;
 }): ConstructionDirective {
   return (room: Room, _context: ConstructionContext) => {
-    if (!room.controller || room.controller.level < options.minRcl) return;
+    if (!room.controller || room.controller.level < options.minRcl) return false;
     const built = room.find(FIND_MY_SPAWNS).length;
     const queued = room.find(FIND_MY_CONSTRUCTION_SITES, {
       filter: (s) => s.structureType === STRUCTURE_SPAWN,
     }).length;
-    if (built + queued >= options.maxSpawns) return;
-    if (!hasCpu(0.5)) return;
+    if (built + queued >= options.maxSpawns) return false;
+    if (!hasCpu(0.5)) return false;
 
     const anchors = getAnchorPositions(room, "controller");
     for (const anchor of anchors) {
@@ -140,9 +147,11 @@ export function ensureAdditionalSpawns(options: {
       const result = spot.createConstructionSite(STRUCTURE_SPAWN);
       if (result === OK) {
         markRoomCostMatrixDirty(room);
-        return;
+        return true;
       }
     }
+
+    return false;
   };
 }
 
@@ -168,8 +177,15 @@ export function runConstructionPlan(
   directives: ConstructionDirective[],
   context: ConstructionContext,
 ): void {
+  if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
+    return;
+  }
+
   for (const directive of directives) {
     if (!hasCpu(0.2)) break;
-    directive(room, context);
+    const placed = directive(room, context);
+    if (placed) {
+      break;
+    }
   }
 }

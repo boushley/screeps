@@ -75,7 +75,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
     id: "core",
     description: "Interior economy-focused rooms with light defenses",
     spawn: {
-      upgraderTarget: 3,
+      upgraderTarget: 4,
       builderTarget: 2,
       haulerTarget: 3,
       warrior: {
@@ -121,25 +121,23 @@ function storageDirective(options: {
   cooldown: number;
 }): ConstructionDirective {
   return (room: Room, context) => {
-    if (!room.controller || room.controller.level < options.minRcl) return;
-    if (context.spawnFillAvg < options.minSpawnFill) return;
-    if ((context.roleCounts.hauler ?? 0) < options.minHaulers) return;
-    if (room.storage) return;
+    if (!room.controller || room.controller.level < options.minRcl) return false;
+    if (context.spawnFillAvg < options.minSpawnFill) return false;
+    if ((context.roleCounts.hauler ?? 0) < options.minHaulers) return false;
+    if (room.storage) return false;
     const existingSite = room.find(FIND_MY_CONSTRUCTION_SITES, {
       filter: (site) => site.structureType === STRUCTURE_STORAGE,
     });
-    if (existingSite.length > 0) return;
+    if (existingSite.length > 0) return false;
 
     const data = room.mem.strategyData ?? (room.mem.strategyData = {});
     if (data.lastStorageAttempt && Game.time - data.lastStorageAttempt < options.cooldown) {
-      return;
+      return false;
     }
 
-    if (placeStorageConstruction(room)) {
-      data.lastStorageAttempt = Game.time;
-    } else {
-      data.lastStorageAttempt = Game.time;
-    }
+    const placed = placeStorageConstruction(room);
+    data.lastStorageAttempt = Game.time;
+    return placed;
   };
 }
 
