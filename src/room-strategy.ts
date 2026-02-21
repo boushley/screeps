@@ -17,7 +17,7 @@ export interface WarriorSpawnPolicy {
 
 export interface SpawnPreferences {
   upgraderTarget: number;
-  builderCap: number;
+  builderTarget: number;
   warrior: WarriorSpawnPolicy;
   haulerTarget: number;
 }
@@ -76,7 +76,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
     description: "Interior economy-focused rooms with light defenses",
     spawn: {
       upgraderTarget: 3,
-      builderCap: 2,
+      builderTarget: 2,
       haulerTarget: 3,
       warrior: {
         maxActive: 2,
@@ -97,7 +97,7 @@ const STRATEGIES: Record<RoomStrategyId, RoomStrategy> = {
     description: "Frontier rooms emphasizing defenses and heavier warriors",
     spawn: {
       upgraderTarget: 1,
-      builderCap: 1,
+      builderTarget: 1,
       haulerTarget: 2,
       warrior: {
         maxActive: 4,

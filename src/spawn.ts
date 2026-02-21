@@ -48,7 +48,7 @@ function getNextSpawnRequest(room: Room): SpawnRequest | null {
 
   // Builders: only when construction sites exist, max 2
   const sites = room.find(FIND_CONSTRUCTION_SITES);
-  if (sites.length > 0 && builderCount < strategy.spawn.builderCap) {
+  if (sites.length > 0 && builderCount < strategy.spawn.builderTarget) {
     return { role: "builder", emergency: false };
   }
 
